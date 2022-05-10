@@ -1,0 +1,16 @@
+div {
+    padding: 5px;
+}
+
+.MuiDialogActions-root {
+    justify-content: center !important;
+    margin-top: 15px;
+}
+
+button {
+    font-weight: bold;
+}
+
+#chooseTypeTitle {
+    margin-right: 15px;
+}

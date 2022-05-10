@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { TodoContext } from '../../context/tasksContext';
-import { Actions, IPriority, ITask, TodoContextType, IStatus } from '../../types/todoTypes';
+import { TodoContext } from '../../../context/tasksContext';
+import { Actions, IPriority, ITask, TodoContextType, IStatus } from '../../../types/tasksTypes';
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -13,11 +13,11 @@ import { Autocomplete } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import './TaskForm.css';
-import { priorityOptions, statusesOptions } from '../../constants/constants';
+import { priorityOptions, statusesOptions } from '../../../constants/constants';
 
 interface TaskFormProps {
     action: Actions.Create | Actions.UPDATE;
-    idToUpdate?: string;
+    item?: ITask;
     handleCloseTaskDialog(): void;
 }
 
@@ -28,10 +28,9 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const TaskForm = ({ action, idToUpdate, handleCloseTaskDialog }: TaskFormProps) => {
+const TaskForm = ({ action, item, handleCloseTaskDialog }: TaskFormProps) => {
     const classes = useStyles();
     const { addToDo, updateTodo, getTask } = useContext(TodoContext) as TodoContextType;
-
     let [taskInputs, setTaskInputs] = useState<ITask>({
         title: "",
         id: "",
@@ -42,8 +41,7 @@ const TaskForm = ({ action, idToUpdate, handleCloseTaskDialog }: TaskFormProps) 
         review: " ",
         timeSpent: "",
         untilDate: "",
-    })
-
+    });
     let [dialogTitle, setDialogTitle] = useState("");
     let [buttonText, setButtonText] = useState("");
     let [disabled, setDisabled] = useState(false);
@@ -53,16 +51,16 @@ const TaskForm = ({ action, idToUpdate, handleCloseTaskDialog }: TaskFormProps) 
             setDialogTitle("Create Task");
             setButtonText("Create");
         }
-        if (action === Actions.UPDATE && idToUpdate) {
+        if (action === Actions.UPDATE && item) {
             setButtonText("Update");
-            let todo: ITask | null = getTask(idToUpdate);
+            let todo: ITask | null = getTask(item.id);
             setDialogTitle("Update Task");
             setDisabled(true);
             if (todo) {
                 setTaskInputs({ ...taskInputs, id: todo.id, title: todo.title, description: todo.description, status: todo.status, estimatedTime: todo.estimatedTime, priority: todo.priority, timeSpent: todo.timeSpent, untilDate: todo.untilDate, review: todo.review })
             }
         }
-    }, []);
+    }, [action, item]);
 
 
     const taskFormSubmit = (event: React.SyntheticEvent) => {
@@ -78,7 +76,7 @@ const TaskForm = ({ action, idToUpdate, handleCloseTaskDialog }: TaskFormProps) 
         if (action === Actions.Create) {
             addToDo(taskInputs);
         }
-        if (action === Actions.UPDATE && idToUpdate) {
+        if (action === Actions.UPDATE && item) {
             updateTodo(taskInputs);
         }
         handleCloseTaskDialog();
@@ -178,10 +176,10 @@ const TaskForm = ({ action, idToUpdate, handleCloseTaskDialog }: TaskFormProps) 
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
-                                    value={taskInputs.untilDate}
+                                    value={taskInputs.untilDate?.replace(" ", "T")}
 
                                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-                                        setTaskInputs({ ...taskInputs, untilDate: event.target.value });
+                                        setTaskInputs({ ...taskInputs, untilDate: event.target.value.replace("T", " ") });
                                     }}
                                 />
                             </div>

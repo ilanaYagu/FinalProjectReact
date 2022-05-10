@@ -1,4 +1,5 @@
-import { makeStyles, Theme, createStyles } from "@material-ui/core";
+import { Theme } from "@mui/material";
+import { makeStyles, createStyles } from "@mui/styles";
 
 const drawerWidth = 300;
 const logoHeight = 50;
@@ -14,16 +15,14 @@ const UseStyles = makeStyles((theme: Theme) =>
             display: "flex"
         },
         appBar: {
-            [theme.breakpoints.up("sm")]: {
-                width: `calc(100% - ${drawerWidth}px)`,
-                marginRight: drawerWidth
-            },
+            width: `calc(100% - ${drawerWidth}px)`,
+            marginRight: drawerWidth
+            ,
             boxShadow: "none"
         },
         drawer: {
-            [theme.breakpoints.up("sm")]: {
-                width: drawerWidth
-            }
+            width: drawerWidth
+
         },
         drawerPaper: {
             width: drawerWidth,

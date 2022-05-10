@@ -1,0 +1,54 @@
+.TasksTable {
+    width: 100% !important;
+}
+
+.TableRow td {
+    font-size: 16px;
+    white-space: nowrap;
+    width: 2%;
+    height: 50px;
+    max-width: 10%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-content: center;
+    text-align: center;
+
+}
+
+
+.head th {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+}
+
+#updateTaskButton {
+    font-weight: bold;
+}
+
+#deleteTaskButton {
+    font-weight: bold;
+}
+
+.MuiTablePagination-toolbar {
+    font-size: 16px !important;
+}
+
+.MuiTablePagination-caption {
+    padding: 8;
+    font-size: 16px !important;
+}
+
+.MuiTablePagination-root {
+    overflow: inherit !important;
+}
+
+.otherInfo {
+    display: inline-block;
+    width: 120px;
+    height: 60px;
+}
+
+em {
+    text-decoration: underline;
+}

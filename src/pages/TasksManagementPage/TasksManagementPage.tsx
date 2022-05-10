@@ -1,104 +1,55 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Actions, IPriority, IStatus, ITask, TodoContextType } from '../../types/todoTypes';
+import React, { useContext, useState } from 'react';
+import { Actions, ITask, TodoContextType } from '../../types/tasksTypes';
 import Button from "@mui/material/Button";
-import TaskForm from '../../components/TaskForm/TaskForm';
-import DeleteTaskForm from '../../components/DeleteTaskForn/DeleteTaskForm';
-import { Box, MenuItem, Select, SelectChangeEvent, Stack, TextField } from '@mui/material';
-import { TasksTable } from '../../components/TasksTable/TasksTable';
+import { Box, TextField } from '@mui/material';
 import { TodoContext } from '../../context/tasksContext';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import FiltersTasksTable from '../../components/Tasks/FilterTasksTable/FilterTasksTable';
+import DeleteForm from '../../components/shared/DeleteForn/DeleteForm';
+import { columnsForTasksTable, customRenderers, otherColumnForTasksTable } from '../../constants/constants';
+import GenericTable from '../../components/GenericTable/GenericTable';
 import './TasksManagementPage.css';
-import { priorityOptions, statusesOptions } from '../../constants/constants';
+import DialogForm from '../../components/DialogForm/DialogForm';
 
 const TasksManagementPage = () => {
     const { todos, deleteToDo } = useContext(TodoContext) as TodoContextType;
     const [tasks, setTasks] = useState<ITask[]>(todos);
-    const [isDeleteTaskDialogOpen, setIsDeleteTaskDialogOpen] = useState(false);
-    const [isTaskFormDialogOpen, setIsTaskFormDialogOpen] = useState(false);
-    const [idTaskToUpdate, setIdTaskToUpdate] = useState("");
-    const [idTaskToDelete, setIdTaskToDelete] = useState("");
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+    const [itemToUpdate, setItemToUpdate] = useState<ITask | "">("");
+    const [itemToDelete, setItemToDelete] = useState<"" | ITask>("");
     const [action, setAction] = useState(Actions.Create);
     const [search, setSearch] = React.useState("");
-    const [filters, setFilters] = useState({
-        selectedFilterStatus: "",
-        selectedFilterPriority: "",
-    });
 
-
-    useEffect(() => {
-        setTasks(todos.filter((item: ITask) => {
-            return (item.priority === filters.selectedFilterPriority || filters.selectedFilterPriority === "")
-                && (item.status === filters.selectedFilterStatus || filters.selectedFilterStatus === "")
-        }));
-    }, [filters, todos])
-
-    const handleOpenTaskDialog = () => {
-        setIsTaskFormDialogOpen(true);
-    };
-
-    const handleCloseTaskDialog = () => {
-        setIsTaskFormDialogOpen(false);
+    const handleCloseDialog = () => {
+        setIsFormDialogOpen(false);
         setAction(Actions.Create);
-        setIdTaskToUpdate("");
+        setItemToUpdate("");
     };
 
-    const handleOpenUpdateTaskDialog = (id: string) => {
-        setIsTaskFormDialogOpen(true);
-        setIdTaskToUpdate(id);
+    const handleOpenDialog = (item: ITask) => {
+        setIsFormDialogOpen(true);
+        setItemToUpdate(item);
         setAction(Actions.UPDATE);
     };
 
-    const handleOpenDeleteTaskDialog = (id: string) => {
-        setIsDeleteTaskDialogOpen(true);
-        setIdTaskToDelete(id);
-
-    };
-
-    const handleCloseDeleteTaskDialog = () => {
-        setIsDeleteTaskDialogOpen(false);
-        setIdTaskToDelete("");
-    };
-
-    const handleDeleteTask = (id: string) => {
-        deleteToDo(id);
-        handleCloseDeleteTaskDialog();
-        setTasks(
-            tasks.filter(task => task.id !== id)
-        );
+    const handleOpenCreateDialog = () => {
+        setIsFormDialogOpen(true);
     }
 
-    const renderQuickFilters = () => {
-        return <Box display="flex">
-            <div>Quick Filters:</div>
+    const handleOpenDeleteDialog = (item: ITask) => {
+        setIsDeleteDialogOpen(true);
+        setItemToDelete(item);
+    };
 
-            <Select
-                style={{ width: "12%", height: "40px", marginLeft: "9px", marginRight: "9px" }}
-                value={filters.selectedFilterStatus}
-                onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, selectedFilterStatus: event.target.value })}
-                name="status"
-                displayEmpty
-            >
-                <MenuItem value="">All Statuses</MenuItem>
-                {
-                    statusesOptions.map((statusOption: IStatus) => <MenuItem value={statusOption}>{statusOption}</MenuItem>)
-                }
-            </Select>
-
-            <Select
-                style={{ width: "12%", height: "40px", marginLeft: "9px", marginRight: "9px" }}
-                value={filters.selectedFilterPriority}
-                onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, selectedFilterPriority: event.target.value })}
-                name="priority"
-                displayEmpty
-            >
-                <MenuItem value="">All Priorities</MenuItem>
-                {
-                    priorityOptions.map((priorityOption: IPriority) => <MenuItem value={priorityOption}>{priorityOption}</MenuItem>)
-                }
-            </Select>
-        </Box>
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteDialogOpen(false);
+        setItemToDelete("");
+    };
+    const handleDelete = (item: ITask) => {
+        deleteToDo(item.id);
+        handleCloseDeleteDialog();
     }
-
 
 
     return (
@@ -109,16 +60,27 @@ const TasksManagementPage = () => {
             <Button
                 variant="contained"
                 id='addTaskButton'
-                onClick={handleOpenTaskDialog} startIcon={<AddTaskIcon />}>
+                onClick={handleOpenCreateDialog} startIcon={<AddTaskIcon />}>
                 Add Task
             </Button>
-            {renderQuickFilters()}
+            <FiltersTasksTable setTasks={setTasks} />
             <h4>Total num of tasks: {todos.length}</h4>
-            {isTaskFormDialogOpen &&
-                <TaskForm handleCloseTaskDialog={handleCloseTaskDialog} action={action} idToUpdate={idTaskToUpdate} />}
-            <TasksTable handleOpenDeleteTaskDialog={handleOpenDeleteTaskDialog} handleOpenUpdateTaskDialog={handleOpenUpdateTaskDialog} items={tasks} search={search} />
-            {isDeleteTaskDialogOpen &&
-                <DeleteTaskForm handleCloseDeleteTaskDialog={handleCloseDeleteTaskDialog} handleDeleteTask={handleDeleteTask} id={idTaskToDelete} />}
+            {isFormDialogOpen &&
+                <DialogForm type="Task" handleCloseDialog={handleCloseDialog} action={action} itm={itemToUpdate ? itemToUpdate : undefined} />}
+
+            <GenericTable
+                headers={columnsForTasksTable}
+                otherColumn={otherColumnForTasksTable}
+                items={tasks}
+                customRenderers={customRenderers}
+                deleteItem={handleOpenDeleteDialog}
+                editItem={handleOpenDialog}
+                search={search}
+                searchableProperties={["title"]}
+
+            />
+            {isDeleteDialogOpen &&
+                <DeleteForm handleCloseDeleteTaskDialog={handleCloseDeleteDialog} item={itemToDelete} handleDelete={handleDelete} />}
         </Box>
     );
 };

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TodoContextType, ITask } from '../types/todoTypes';
+import { TodoContextType, ITask } from '../types/tasksTypes';
 
 export const TodoContext = React.createContext<TodoContextType | null>(null);
 
@@ -7,16 +7,17 @@ const TodoProvider: React.FC<React.ReactNode> = ({ children }) => {
     let [todos, setTodos] = React.useState<ITask[]>([
         {
             id: "1",
-            title: 'post 1',
-            description: 'this is a description',
-            status: "Open",
-            priority: "Low",
-            estimatedTime: "3d"
+            title: 'Do my final project',
+            description: 'I need to fix some things.',
+            status: "In Progress",
+            priority: "Top",
+            estimatedTime: "3d",
+            untilDate: "2022-06-24 21:00"
         },
         {
             id: "2",
-            title: 'post 2',
-            description: 'this is a description',
+            title: 'Help my mom in the market',
+            description: 'grab things, take all we need.',
             status: "Open",
             priority: "Low",
             estimatedTime: "1w"
@@ -27,21 +28,23 @@ const TodoProvider: React.FC<React.ReactNode> = ({ children }) => {
     };
     const updateTodo = (todo: ITask) => {
         let i: number;
+        const temp = [...todos];
 
-        for (i = 0; i < todos.length; i++) {
-            if (todos[i].id === todo.id) {
-                todos[i] = todo;
-                console.log(todos[i])
+        for (i = 0; i < temp.length; i++) {
+            if (temp[i].id === todo.id) {
+                temp[i] = todo;
+                console.log(temp[i])
             }
         }
+        setTodos(temp);
     };
 
     const deleteToDo = (id: string) => {
-        todos.map((todo, index) => {
-            if (todo.id === id) {
-                todos.splice(index, 1);
-            }
-        })
+
+        const newTodoArr: ITask[] = todos.filter((todo, index) => {
+            return todo.id !== id
+        });
+        setTodos(newTodoArr);
     }
 
     const getTask = (id: string): ITask | null => {

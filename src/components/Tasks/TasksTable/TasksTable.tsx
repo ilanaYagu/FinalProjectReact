@@ -15,7 +15,7 @@ import {
     TablePagination,
     TableRow
 } from "@mui/material";
-import { ITask } from "../../types/todoTypes";
+import { ITask } from "../../../types/tasksTypes";
 import { useState } from "react";
 import './TasksTable.css';
 import EditIcon from '@mui/icons-material/Edit';
@@ -25,11 +25,11 @@ import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDouble
 import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
 import { green, pink } from "@mui/material/colors";
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { columnsForTasksTable } from "../../constants/constants";
+import { columnsForTasksTable } from "../../../constants/constants";
 
 interface TasksTableProps {
-    handleOpenDeleteTaskDialog(id: string): void;
-    handleOpenUpdateTaskDialog(id: string): void;
+    handleOpenDeleteTaskDialog(item: ITask): void;
+    handleOpenUpdateTaskDialog(item: ITask): void;
     items: ITask[];
     search: string;
 }
@@ -37,9 +37,6 @@ interface TasksTableProps {
 export const TasksTable = ({ handleOpenDeleteTaskDialog, handleOpenUpdateTaskDialog, items, search }: TasksTableProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-
-    const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - items.length) : 0;
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -88,7 +85,7 @@ export const TasksTable = ({ handleOpenDeleteTaskDialog, handleOpenUpdateTaskDia
                         {...draggableProvided.draggableProps}
                         {...draggableProvided.dragHandleProps}
                     >
-                        <TableCell align="left">
+                        <TableCell align="left" style={{ width: "10px !important" }}>
                             {
                                 item.priority === "Low" ?
                                     <AssignmentIcon />
@@ -135,10 +132,10 @@ export const TasksTable = ({ handleOpenDeleteTaskDialog, handleOpenUpdateTaskDia
                             }
                         </TableCell>
                         <TableCell>
-                            <IconButton aria-label="edit" id="updateTaskButton" color="primary" onClick={() => handleOpenUpdateTaskDialog(item.id)}>
+                            <IconButton aria-label="edit" id="updateTaskButton" color="primary" onClick={() => handleOpenUpdateTaskDialog(item)}>
                                 <EditIcon />
                             </IconButton>
-                            <IconButton aria-label="delete" id="deleteTaskButton" onClick={() => handleOpenDeleteTaskDialog(item.id)}>
+                            <IconButton aria-label="delete" id="deleteTaskButton" onClick={() => handleOpenDeleteTaskDialog(item)}>
                                 <DeleteIcon />
                             </IconButton>
                         </TableCell>
@@ -169,21 +166,9 @@ export const TasksTable = ({ handleOpenDeleteTaskDialog, handleOpenUpdateTaskDia
         </DragDropContext>
     }
 
-    const renderHeader = () => {
-        return <TableHead className="head">
-            <TableRow>
-                {
-                    columnsForTasksTable.map((column) => {
-                        return <TableCell align="right">{column.label}</TableCell>
-                    })
-                }
-            </TableRow>
-        </TableHead>
-    }
 
     return (
         <Table>
-            {renderHeader()}
             {renderBody()}
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}

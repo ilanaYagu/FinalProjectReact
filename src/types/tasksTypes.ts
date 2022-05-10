@@ -10,6 +10,7 @@ export interface ITask {
     untilDate?: string;
 }
 
+
 export type IPriority = "Low" | "Regular" | "Top";
 export type IStatus = 'Open' | 'In Progress' | 'Done';
 

@@ -1,20 +1,16 @@
-import * as React from 'react'
-import TodoProvider from './context/tasksContext'
-import TasksManagementPage from './pages/TasksManagementPage/TasksManagementPage'
-import './App.css'
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
-import EventsManagementPage from './pages/EventsManagementPage/EventsMmanagementPage'
-import { NavBarSide } from './components/NavBar/NavBarSide'
+import * as React from 'react';
+import TodoProvider from './context/tasksContext';
+import TasksManagementPage from './pages/TasksManagementPage/TasksManagementPage';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import EventsManagementPage from './pages/EventsManagementPage/EventsManagementPage';
+import { NavBarSide } from './components/NavBar/NavBarSide';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { useMediaQuery } from '@material-ui/core'
-import { useTheme } from '@emotion/react'
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { CssBaseline } from '@mui/material';
+import { blueGrey, grey } from '@mui/material/colors';
+import EventsProvider from './context/eventsContext';
+import './App.css';
+import DashboardPage from './pages/DashboardPage/DashboardPage';
 
-import IconButton from '@mui/material/IconButton';
-import Box from '@mui/material/Box';
-import { CssBaseline } from '@mui/material'
-import { blueGrey, grey, purple } from '@mui/material/colors'
 export default function App() {
 
 
@@ -34,9 +30,10 @@ export default function App() {
         paper: grey[900],
       },
       text: {
-        primary: '#ffff',
-        secondary: '#ffff',
+        primary: '#fff',
+        secondary: '#fff',
         disabled: '#ffeaea',
+
       }
     },
   });
@@ -48,13 +45,18 @@ export default function App() {
       <CssBaseline />
 
       <TodoProvider >
-        <Router>
-          <Routes>
-            <Route path="/tasks" element={<TasksManagementPage />} />
-            <Route path="/events" element={<EventsManagementPage />} />
-          </Routes>
-          <NavBarSide />
-        </Router>
+        <EventsProvider>
+          <Router>
+            <Routes>
+              <Route path="/tasks" element={<TasksManagementPage />} />
+              <Route path="/events" element={<EventsManagementPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+
+            </Routes>
+            <NavBarSide />
+          </Router>
+        </EventsProvider>
+
       </TodoProvider>
     </ThemeProvider>
 

@@ -10,7 +10,7 @@ import {
     ListItemText
 } from "@mui/material";
 import earth from '../../images/earth.png';
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export const NavBarSide = () => {
     const classes = UseStyles() as any;
@@ -24,7 +24,7 @@ export const NavBarSide = () => {
             }}
         >
             <Box component="div" className={classes.logo}>
-                <h1>Purpule Calendar</h1>
+                <h1>Purple Calendar</h1>
                 <Container className={classes.listItemContainer}>
                     <img
                         src={earth} height="80%" width="50%"
