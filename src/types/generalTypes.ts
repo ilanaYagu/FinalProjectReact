@@ -2,16 +2,16 @@ import { IEvent } from "./eventsTypes";
 import { ITask } from "./tasksTypes";
 
 
-export interface MinTableItem {
+export interface IMinTableItem {
     id: string;
 }
 
-export type otherColumnProperties<T> = Record<keyof T, string> | Record<string, string>;
+export type otherColumnProperties<T> = Partial<Record<keyof T, string>>;
 
-export type CustomRenderers<T extends MinTableItem> = Partial<
+export type CustomRenderers<T extends IMinTableItem> = Partial<
     Record<keyof T | string, (it: T) => React.ReactNode>
 >;
-export type TableHeaders<T extends MinTableItem> = Record<keyof T, string> | Record<string, string>;
+export type TableHeaders<T extends IMinTableItem> = Partial<Record<keyof T, string>> | Record<"type" | "actions" | "other", string>;
 
 export type ItemFormType = "Task" | "Event";
 

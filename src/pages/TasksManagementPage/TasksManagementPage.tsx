@@ -8,7 +8,7 @@ import FiltersTasksTable from '../../components/FiltersTasksTable/FiltersTasksTa
 import DeleteForm from '../../components/DeleteForn/DeleteForm';
 import { columnsForTasksTable, customRenderers, otherColumnForTasksTable } from '../../constants/constants';
 import ItemsTable from '../../components/ItemsTable/ItemsTable';
-import DialogForm from '../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm';
+import ItemUpdateAndCreateForm from '../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm';
 import { DeleteItemFormContextType, ItemFormContextType } from '../../types/generalTypes';
 import { ItemFormContext } from '../../context/itemFormContext';
 import { DeleteItemFormContext } from '../../context/deleteItemFormContext';
@@ -41,7 +41,7 @@ const TasksManagementPage = () => {
             <h4>Total num of tasks: {tasks.length}</h4>
 
             {isFormDialogOpen &&
-                <DialogForm type="Task" />}
+                <ItemUpdateAndCreateForm type="Task" />}
 
             <ItemsTable
                 headers={columnsForTasksTable}

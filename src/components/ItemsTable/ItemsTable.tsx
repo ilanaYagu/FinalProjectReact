@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import {
     IconButton,
     Table,
@@ -11,18 +11,10 @@ import {
 import { DragDropContext, Draggable, DraggableProvided, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CustomRenderers, ItemFormContextType, MinTableItem, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
+import { CustomRenderers, IMinTableItem, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
 import './ItemsTable.css';
 
-function objectValues<T extends {}>(obj: T) {
-    return Object.keys(obj).map((objKey) => obj[objKey as keyof T]);
-}
-
-function objectKeys<T extends {}>(obj: T) {
-    return Object.keys(obj).map((objKey) => objKey as keyof T);
-}
-
-interface ItemsTableProps<T extends MinTableItem> {
+interface ItemsTableProps<T extends IMinTableItem> {
     items: T[];
     headers: TableHeaders<T>;
     customRenderers?: CustomRenderers<T>;
@@ -33,7 +25,7 @@ interface ItemsTableProps<T extends MinTableItem> {
     searchableProperties: (keyof T)[];
 }
 
-export default function ItemsTable<T extends MinTableItem>(props: ItemsTableProps<T>) {
+export default function ItemsTable<T extends IMinTableItem>(props: ItemsTableProps<T>) {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -63,18 +55,18 @@ export default function ItemsTable<T extends MinTableItem>(props: ItemsTableProp
                             {...draggableProvided.dragHandleProps}
                         >
                             {
-                                objectKeys(props.headers).map((headerKey) => {
+                                Object.entries(props.headers).map(([headerKey]) => {
                                     if (headerKey !== "other" && headerKey !== "actions") {
                                         const customRenderer = props.customRenderers?.[headerKey];
                                         return <TableCell>
                                             {
                                                 customRenderer ?
-                                                    customRenderer(item) : headerKey in item ? item[headerKey]
+                                                    customRenderer(item) : headerKey in item ? item[headerKey as keyof T]
                                                         : ""
                                             }
                                         </TableCell>
                                     }
-                                    return;
+                                    return <></>;
                                 })
                             }
                             {
@@ -122,7 +114,7 @@ export default function ItemsTable<T extends MinTableItem>(props: ItemsTableProp
 
     const isMatchedWithSearchFilter = (itm: T) => {
         let isMatched = false;
-        props.searchableProperties.map((k: keyof T) => {
+        props.searchableProperties.forEach((k: keyof T) => {
             const valueToCheck: string = itm[k] as unknown as string;
             isMatched = isMatched || valueToCheck.toLowerCase().includes(props.search.toLowerCase());
         });
@@ -133,9 +125,8 @@ export default function ItemsTable<T extends MinTableItem>(props: ItemsTableProp
         <Table>
             <TableHead className="head">
                 <TableRow>
-                    {objectValues(props.headers).map((headerValue) => {
-                        console.log(headerValue)
-                        return <TableCell>{headerValue}</TableCell>
+                    {Object.entries(props.headers).map(([key, header]) => {
+                        return <TableCell>{header}</TableCell>
                     })}
                 </TableRow>
             </TableHead>

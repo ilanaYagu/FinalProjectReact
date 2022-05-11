@@ -7,7 +7,7 @@ import ItemsTable from '../../components/ItemsTable/ItemsTable';
 import { EventsContext } from '../../context/eventsContext';
 import { EventsContextType, IEvent } from '../../types/eventsTypes';
 import FiltersEventsTable from '../../components/FiltersEventsTable/FiltersEventsTable';
-import DialogForm from '../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm';
+import ItemUpdateAndCreateForm from '../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import { ItemFormContext } from '../../context/itemFormContext';
 import { DeleteItemFormContextType, ItemFormContextType } from '../../types/generalTypes';
@@ -52,8 +52,7 @@ const EventsManagementPage = () => {
             />
 
             {isFormDialogOpen &&
-                <DialogForm type="Event" />}
-
+                <ItemUpdateAndCreateForm type="Event" />}
 
             {isDeleteDialogOpen &&
                 <DeleteForm item={itemToDelete} handleDelete={handleDelete} />}

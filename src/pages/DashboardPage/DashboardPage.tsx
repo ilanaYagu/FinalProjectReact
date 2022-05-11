@@ -4,7 +4,7 @@ import { TasksContext } from "../../context/tasksContext";
 import { EventsContextType, IEvent } from "../../types/eventsTypes";
 import { ITask, TasksContextType } from "../../types/tasksTypes";
 import DeleteForm from "../../components/DeleteForn/DeleteForm";
-import DialogForm from "../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm";
+import ItemUpdateAndCreateForm from "../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm";
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import { columnsForTodayTasksAndEventsTable, customRenderers, filterTodaysEvents, filterTodaysTasks, otherColumnForTodayTasksAndEventsTable } from "../../constants/constants";
 import { Button, TextField } from "@mui/material";
@@ -27,7 +27,7 @@ const DashboardPage = () => {
         setData([...filterTodaysEvents(events), ...filterTodaysTasks(tasks)])
     }, [tasks, events])
 
-    const handleDelete = (item: IEvent | ITask) => {
+    const handleDelete = (item: IEvent | ITask): void => {
         "priority" in item ?
             deleteTask(item.id) : deleteEvent(item.id);
         handleCloseDeleteDialog();
@@ -57,7 +57,7 @@ const DashboardPage = () => {
                 searchableProperties={["title"]}
             />
             {isFormDialogOpen &&
-                <DialogForm choose={true} type={itemToUpdate ? "priority" in itemToUpdate ? "Task" : "Event" : "Task"} />}
+                <ItemUpdateAndCreateForm enableSwitchType={true} type={itemToUpdate ? "priority" in itemToUpdate ? "Task" : "Event" : "Task"} />}
 
             {isDeleteDialogOpen &&
                 <DeleteForm handleDelete={handleDelete} item={itemToDelete} />}

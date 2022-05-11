@@ -10,7 +10,7 @@ const EventsProvider: React.FC<React.ReactNode> = ({ children }) => {
             id: "1",
             title: 'Vet - for my dogo',
             description: 'The doctor ask me to call him one day before the appointment.',
-            beginningTime: '2022-07-09 12:23',
+            beginningTime: '2022-05-11 12:23',
             endingTime: '2022-07-09 13:23',
             color: createColor("#C88383"),
             location: "Ashkelon, the clinic of Yosof",

@@ -16,16 +16,16 @@ import { TasksContext } from '../../context/tasksContext';
 import { EventsContextType, IEvent } from '../../types/eventsTypes';
 import { Color, ColorPicker, createColor } from 'material-ui-color';
 import { EventsContext } from '../../context/eventsContext';
-import './ItemUpdateAndCreateForm.css';
 import { IBasicType, ItemFormContextType, ItemFormType } from '../../types/generalTypes';
 import InvitedGuestsFiled from './InvitedGuestsFiled';
 import { ItemFormContext } from '../../context/itemFormContext';
+import './ItemUpdateAndCreateForm.css';
 
-const optionsDialogType: ItemFormType[] = ["Task", "Event"];
+const itemFormTypeOptions: ItemFormType[] = ["Task", "Event"];
 
-interface DialogFormProps {
+interface ItemUpdateAndCreateFormProps {
     type: ItemFormType;
-    choose?: boolean;
+    enableSwitchType?: boolean;
 }
 
 const useStyles = makeStyles(() => ({
@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const DialogForm = ({ type, choose }: DialogFormProps) => {
+const ItemUpdateAndCreateForm = ({ type, enableSwitchType }: ItemUpdateAndCreateFormProps) => {
     const classes = useStyles();
     const { addTask, updateTask, getTask } = useContext(TasksContext) as TasksContextType;
     const { addEvent, updateEvent, getEvent } = useContext(EventsContext) as EventsContextType;
@@ -81,9 +81,9 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                     setEventInputs({ ...eventInputs, color: item.color, beginningTime: item.beginningTime, endingTime: item.endingTime, location: item.location, notificationTime: item.notificationTime, invitedGuests: item.invitedGuests })
             }
         }
-    }, [itemToUpdate]);
+    }, [itemToUpdate, formType]);
 
-    const formSubmit = (event: React.SyntheticEvent) => {
+    const formSubmit = (event: React.SyntheticEvent): void => {
         event.preventDefault();
         if (isValidFileds()) {
             if (!itemToUpdate) {
@@ -101,18 +101,18 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
         }
     }
 
-    const isValidFileds = () => {
+    const isValidFileds = (): boolean => {
         let isValid = false;
         if (
             validator.trim(sharedInputs.id) === "" ||
             validator.trim(sharedInputs.title) === "" ||
             validator.trim(sharedInputs.description) === "" ||
-            type === "Event" && validator.trim(eventInputs.beginningTime) === "" ||
-            type === "Event" && validator.trim(eventInputs.endingTime) === ""
+            (formType === "Event" && validator.trim(eventInputs.beginningTime) === "") ||
+            (formType === "Event" && validator.trim(eventInputs.endingTime) === "")
         ) {
             alert("Please fill the Required Fields");
         }
-        else if (type === "Event" && new Date(eventInputs.beginningTime) > new Date(eventInputs.endingTime)) {
+        else if (formType === "Event" && new Date(eventInputs.beginningTime) > new Date(eventInputs.endingTime)) {
             alert("Please check your beginning and ending times");
         } else {
             isValid = true;
@@ -120,7 +120,7 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
         return isValid;
     }
 
-    const renderTaskDetails = () => {
+    const renderTaskDetails = (): JSX.Element => {
         return <div>
             <div>
                 <Autocomplete
@@ -130,10 +130,10 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                     disableClearable
                     options={statusesOptions.map((option: IStatus) => option)}
                     onChange={(event: React.FormEvent) => {
-                        const newStatus = (event.target as HTMLInputElement).textContent as IStatus;
+                        let newStatus: IStatus = (event.target as HTMLInputElement).textContent as IStatus;
+                        newStatus = !statusesOptions.includes(newStatus) ? "Open" : newStatus;
                         setTaskInputs({ ...taskInputs, status: newStatus, review: newStatus !== "Done" ? "" : taskInputs.review })
                     }}
-
                     renderInput={(params) => (
                         <TextField
                             {...params}
@@ -149,7 +149,6 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
             <div>
                 <TextField id="estimatedTime" label="Estimated Time" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTaskInputs({ ...taskInputs, estimatedTime: event.target.value })} defaultValue={taskInputs.estimatedTime} />
             </div>
-
             <div>
                 <Autocomplete
                     freeSolo
@@ -158,7 +157,8 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                     disableClearable
                     options={priorityOptions.map((option: IPriority) => option)}
                     onChange={(event: React.FormEvent) => {
-                        const newPriority = (event.target as HTMLInputElement).textContent as IPriority;
+                        let newPriority: IPriority = (event.target as HTMLInputElement).textContent as IPriority;
+                        newPriority = !priorityOptions.includes(newPriority) ? "Low" : newPriority;
                         setTaskInputs({ ...taskInputs, priority: newPriority, untilDate: newPriority !== "Top" ? "" : taskInputs.untilDate })
                     }}
                     renderInput={(params) => (
@@ -173,7 +173,6 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                     )}
                 />
             </div>
-
             {
                 taskInputs.priority === "Top" &&
                 <div>
@@ -187,15 +186,12 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                             shrink: true,
                         }}
                         value={taskInputs.untilDate?.replace(" ", "T")}
-
                         onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
                             setTaskInputs({ ...taskInputs, untilDate: event.target.value.replace("T", " ") });
                         }}
                     />
                 </div>
             }
-
-
             {
                 taskInputs.status === "Done" &&
                 <>
@@ -217,7 +213,7 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
         </div>;
     }
 
-    const renderEventDetails = () => {
+    const renderEventDetails = (): JSX.Element => {
         return <div>
             <div>
                 <ColorPicker value={eventInputs.color} onChange={(newColor: Color) => setEventInputs({ ...eventInputs, color: newColor })} />
@@ -234,7 +230,6 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                         shrink: true,
                     }}
                     value={eventInputs.beginningTime.replace(" ", "T")}
-
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
                         setEventInputs({ ...eventInputs, beginningTime: event.target.value.replace("T", " ") });
                     }}
@@ -252,7 +247,6 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                         shrink: true,
                     }}
                     value={eventInputs.endingTime.replace(" ", "T")}
-
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
                         setEventInputs({ ...eventInputs, endingTime: event.target.value.replace("T", " ") });
                     }}
@@ -268,6 +262,37 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
         </div>
     }
 
+    const renderSharedDetails = (): JSX.Element => {
+        return <div>
+            <div>
+                <TextField id="id" label="ID" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSharedInputs({ ...sharedInputs, id: event.target.value })} defaultValue={sharedInputs.id} disabled={disabled} required />
+            </div>
+            <div>
+                <TextField id="title" label="Title" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSharedInputs({ ...sharedInputs, title: event.target.value })} defaultValue={sharedInputs.title} required />
+            </div>
+            <div>Description * : <br />
+                <TextareaAutosize
+                    id="description"
+                    placeholder="Enter desc..."
+                    defaultValue={sharedInputs.description}
+                    onChange={(event: React.FormEvent) => setSharedInputs({ ...sharedInputs, description: (event.target as HTMLInputElement).value })}
+                    style={{ width: 250, height: 100, marginTop: 10, overflow: 'auto', backgroundColor: 'inherit', color: "white" }}
+                    required />
+            </div>
+        </div>
+    }
+
+    const renderDialogActions = (): JSX.Element => {
+        return <DialogActions>
+            <Button onClick={handleCloseDialog} color="secondary" variant="outlined" >
+                Cancel
+            </Button>
+            <Button color="primary" type="submit" variant="contained">
+                {buttonText}
+            </Button>
+        </DialogActions>
+    }
+
 
     return (
         <Dialog
@@ -278,18 +303,14 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
             style={{
                 alignItems: "center"
             }}
-            classes={{ paper: classes.dialog }}
-
-        >
+            classes={{ paper: classes.dialog }}>
             <DialogTitle id="form-dialog-title">{buttonText + " " + formType} </DialogTitle>
             <form onSubmit={formSubmit} noValidate autoComplete="off">
                 <DialogContent>
                     <DialogContentText> Details: </DialogContentText>
-
-
                     <div className="textFieldContainer">
                         {
-                            choose &&
+                            enableSwitchType &&
                             <div>
                                 <span id="chooseTypeTitle">Choose Type:</span>
                                 <Select
@@ -299,33 +320,16 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                                     label="Type"
                                     onChange={(event: SelectChangeEvent<string>) =>
                                         setFormType(event.target.value as ItemFormType)
-                                    }
-                                >
+                                    }>
                                     {
-                                        optionsDialogType.map((typeOption) =>
+                                        itemFormTypeOptions.map((typeOption) =>
                                             <MenuItem value={typeOption}>{typeOption}</MenuItem>
-
                                         )
                                     }
                                 </Select>
                             </div>
                         }
-                        <div>
-                            <TextField id="id" label="ID" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSharedInputs({ ...sharedInputs, id: event.target.value })} defaultValue={sharedInputs.id} disabled={disabled} required />
-                        </div>
-                        <div>
-                            <TextField id="title" label="Title" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSharedInputs({ ...sharedInputs, title: event.target.value })} defaultValue={sharedInputs.title} required />
-                        </div>
-
-                        <div>Description * : <br />
-                            <TextareaAutosize
-                                id="description"
-                                placeholder="Enter desc..."
-                                defaultValue={sharedInputs.description}
-                                onChange={(event: React.FormEvent) => setSharedInputs({ ...sharedInputs, description: (event.target as HTMLInputElement).value })}
-                                style={{ width: 250, height: 100, marginTop: 10, overflow: 'auto', backgroundColor: 'inherit', color: "white" }}
-                                required />
-                        </div>
+                        {renderSharedDetails()}
                         {
                             formType === "Task" ?
                                 renderTaskDetails()
@@ -333,18 +337,13 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
                         }
                     </div>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog} color="secondary" variant="outlined" >
-                        Cancel
-                    </Button>
-                    <Button color="primary" type="submit" variant="contained">
-                        {buttonText}
-                    </Button>
-                </DialogActions>
+                {renderDialogActions()}
             </form>
 
         </Dialog >
     );
 };
 
-export default DialogForm;
+export default ItemUpdateAndCreateForm;
+
+

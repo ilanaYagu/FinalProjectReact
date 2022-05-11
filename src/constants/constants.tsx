@@ -9,7 +9,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import { green, pink } from "@mui/material/colors";
 import { IBeginningTimeEventFilterOption, IEvent } from "../types/eventsTypes";
-import { TableHeaders } from "../types/generalTypes";
+import { otherColumnProperties, TableHeaders } from "../types/generalTypes";
 
 
 export const columnsForTasksTable: TableHeaders<ITask> = {
@@ -22,12 +22,12 @@ export const columnsForTasksTable: TableHeaders<ITask> = {
     actions: "Actions"
 };
 
-export const otherColumnForTasksTable = {
+export const otherColumnForTasksTable: otherColumnProperties<ITask> = {
     untilDate: "Until Date",
     timeSpent: "Time Spent"
 };
 
-export const columnsForTodayTasksAndEventsTable = {
+export const columnsForTodayTasksAndEventsTable: TableHeaders<ITask> | TableHeaders<IEvent> = {
     type: "Type",
     priority: "Priority",
     title: "Title",
@@ -35,7 +35,7 @@ export const columnsForTodayTasksAndEventsTable = {
     actions: "Actions"
 };
 
-export const otherColumnForTodayTasksAndEventsTable = {
+export const otherColumnForTodayTasksAndEventsTable: otherColumnProperties<ITask> | otherColumnProperties<IEvent> = {
     status: "Status",
     untilDate: "Until Date",
     beginningTime: "From",
@@ -44,7 +44,7 @@ export const otherColumnForTodayTasksAndEventsTable = {
     location: "Location"
 };
 
-export const columnsForEventsTable = {
+export const columnsForEventsTable: TableHeaders<IEvent> = {
     color: "Color",
     title: "Title",
     beginningTime: "From",
@@ -53,8 +53,6 @@ export const columnsForEventsTable = {
     actions: "Actions"
 };
 
-
-export const showInOtherColumn = ['estimatedTime', 'timeSpent', 'untilDate', 'location', 'beginningTime', 'endingTime']
 export const statusesOptions: IStatus[] = ['Open', 'In Progress', 'Done'];
 export const priorityOptions: IPriority[] = ['Low', 'Top', 'Regular'];
 
@@ -88,27 +86,27 @@ export const customRenderersEvents = {
     )
 }
 
-export const filterTodaysTasks = (tasks: ITask[]) => {
+export const filterTodaysTasks = (tasks: ITask[]): ITask[] => {
     return tasks.filter((task) => {
         if (task.untilDate) {
             const today = new Date();
             const untilDate = new Date(task.untilDate);
-            return untilDate.getDate() == today.getDate() &&
-                untilDate.getMonth() == today.getMonth() &&
-                untilDate.getFullYear() == today.getFullYear()
+            return untilDate.getDate() === today.getDate() &&
+                untilDate.getMonth() === today.getMonth() &&
+                untilDate.getFullYear() === today.getFullYear()
         }
         return false;
     });
 }
 
-export const filterTodaysEvents = (events: IEvent[]) => {
+export const filterTodaysEvents = (events: IEvent[]): IEvent[] => {
     return events.filter((event) => {
         if (event.beginningTime) {
             const today = new Date();
             const beginningTime = new Date(event.beginningTime);
-            return beginningTime.getDate() == today.getDate() &&
-                beginningTime.getMonth() == today.getMonth() &&
-                beginningTime.getFullYear() == today.getFullYear()
+            return beginningTime.getDate() === today.getDate() &&
+                beginningTime.getMonth() === today.getMonth() &&
+                beginningTime.getFullYear() === today.getFullYear()
         }
         return false;
     });
