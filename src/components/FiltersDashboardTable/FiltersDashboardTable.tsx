@@ -2,23 +2,22 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { EventsContext } from '../../context/eventsContext';
 import { EventsContextType, IBeginningTimeEventFilter, IEvent } from '../../types/eventsTypes';
-import { ITask, TodoContextType } from '../../types/tasksTypes';
-import { TodoContext } from '../../context/tasksContext';
+import { ITask, TasksContextType } from '../../types/tasksTypes';
+import { TasksContext } from '../../context/tasksContext';
 import './FiltersDashboardTable.css';
 import { filterTodaysEvents, filterTodaysTasks } from '../../constants/constants';
-import { FilterDashboardTable } from '../../types/generalTypes';
+import { IFilterDashboardTable } from '../../types/generalTypes';
 
 interface FiltersDashboardTableProps {
     setDataTable(newTasks: (IEvent | ITask)[]): void;
 }
 
 const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => {
-
-    const { tasks } = useContext(TodoContext) as TodoContextType;
+    const { tasks } = useContext(TasksContext) as TasksContextType;
     const { events } = useContext(EventsContext) as EventsContextType;
     const [data, setData] = useState<(ITask | IEvent)[]>([...filterTodaysEvents(events), ...filterTodaysTasks(tasks)]);
 
-    const [filters, setFilters] = useState<FilterDashboardTable[]>([
+    const [filters, setFilters] = useState<IFilterDashboardTable[]>([
         { active: false, label: "Tasks", name: "onlyTasks" },
         { active: false, label: "Events", name: "onlyEvents" },
         { active: false, label: "uncompleted tasks", name: "uncompletedTasks" },
@@ -28,7 +27,7 @@ const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => 
     useEffect(() => {
         setDataTable(data.filter((value: IEvent | ITask) => {
             let isMatch = true;
-            filters.map((val: FilterDashboardTable) => {
+            filters.map((val: IFilterDashboardTable) => {
                 if (val.active) {
                     switch (val.name) {
                         case "onlyTasks": {
@@ -56,10 +55,10 @@ const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => 
         setData([...filterTodaysEvents(events), ...filterTodaysTasks(tasks)])
     }, [events, tasks])
 
-    const onClickFilter = (filter: FilterDashboardTable) => {
+    const onClickFilter = (filter: IFilterDashboardTable) => {
         const newActiveStatus = !filter.active;
         const nfilters = filters.slice();
-        nfilters.forEach((nfilter: FilterDashboardTable) => {
+        nfilters.forEach((nfilter: IFilterDashboardTable) => {
             if (newActiveStatus && filter.name !== nfilter.name) {
                 nfilter.active = false;
             }
@@ -67,7 +66,6 @@ const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => 
                 nfilter.active = newActiveStatus;
             }
         });
-        console.log("onclick")
         setFilters(nfilters);
     }
 
@@ -76,7 +74,7 @@ const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => 
             <div id="titleFilterBox">Quick Filters:</div>
             <div>
                 {
-                    filters.map((filter: FilterDashboardTable) => {
+                    filters.map((filter: IFilterDashboardTable) => {
                         return <Button className={filter.active ? "active filterButton" : "filterButton"} variant="contained"
                             onClick={() => onClickFilter(filter)}>{filter.label}</Button>
 

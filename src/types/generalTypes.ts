@@ -1,5 +1,5 @@
 import { IEvent } from "./eventsTypes";
-import { Actions, ITask } from "./tasksTypes";
+import { ITask } from "./tasksTypes";
 
 
 export interface MinTableItem {
@@ -15,7 +15,7 @@ export type TableHeaders<T extends MinTableItem> = Record<keyof T, string> | Rec
 
 export type ItemFormType = "Task" | "Event";
 
-export interface BasicType {
+export interface IBasicType {
     id: string;
     title: string;
     description: string;
@@ -36,10 +36,10 @@ export type DeleteItemFormContextType = {
     handleOpenDeleteDialog(item: ITask | IEvent): void;
 }
 
-export type FilterDashboardTableOption = "onlyTasks" | "onlyEvents" | "uncompletedTasks" | "highPriorityTasks"
+export type IFilterDashboardTableOption = "onlyTasks" | "onlyEvents" | "uncompletedTasks" | "highPriorityTasks"
 
-export interface FilterDashboardTable {
+export interface IFilterDashboardTable {
     active: boolean;
     label: string;
-    name: FilterDashboardTableOption;
+    name: IFilterDashboardTableOption;
 }

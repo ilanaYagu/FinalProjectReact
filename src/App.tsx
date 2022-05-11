@@ -1,5 +1,5 @@
 import * as React from 'react';
-import TodoProvider from './context/tasksContext';
+import TasksProvider from './context/tasksContext';
 import TasksManagementPage from './pages/TasksManagementPage/TasksManagementPage';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import EventsManagementPage from './pages/EventsManagementPage/EventsManagementPage';
@@ -9,7 +9,6 @@ import { CssBaseline } from '@mui/material';
 import { blueGrey, grey } from '@mui/material/colors';
 import EventsProvider from './context/eventsContext';
 import DashboardPage from './pages/DashboardPage/DashboardPage';
-import './App.css';
 import ItemFormProvider from './context/itemFormContext';
 import DeleteItemFormProvider from './context/deleteItemFormContext';
 
@@ -41,7 +40,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <TodoProvider >
+      <TasksProvider >
         <EventsProvider>
           <ItemFormProvider>
             <DeleteItemFormProvider>
@@ -56,7 +55,7 @@ export default function App() {
             </DeleteItemFormProvider>
           </ItemFormProvider>
         </EventsProvider>
-      </TodoProvider>
+      </TasksProvider>
     </ThemeProvider>
 
   )

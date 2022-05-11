@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { IPriority, IStatus, ITask, ITasksFilter, TodoContextType } from '../../types/tasksTypes';
+import { IPriority, IStatus, ITask, ITasksFilter, TasksContextType } from '../../types/tasksTypes';
 import { Box, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { TodoContext } from '../../context/tasksContext';
+import { TasksContext } from '../../context/tasksContext';
 import { priorityOptions, statusesOptions } from '../../constants/constants';
 
 interface FiltersTasksTableProps {
@@ -9,8 +9,7 @@ interface FiltersTasksTableProps {
 }
 
 const FiltersTasksTable = ({ setTasks }: FiltersTasksTableProps) => {
-    const { tasks } = useContext(TodoContext) as TodoContextType;
-
+    const { tasks } = useContext(TasksContext) as TasksContextType;
     const [filters, setFilters] = useState<ITasksFilter>({
         selectedFilterStatus: "",
         selectedFilterPriority: "",
@@ -18,8 +17,8 @@ const FiltersTasksTable = ({ setTasks }: FiltersTasksTableProps) => {
 
     useEffect(() => {
         setTasks(tasks.filter((item: ITask) => {
-            return (item.priority === filters.selectedFilterPriority || filters.selectedFilterPriority === "")
-                && (item.status === filters.selectedFilterStatus || filters.selectedFilterStatus === "")
+            return (filters.selectedFilterPriority === "" || item.priority === filters.selectedFilterPriority)
+                && (filters.selectedFilterStatus === "" || item.status === filters.selectedFilterStatus)
         }));
     }, [filters, tasks])
 

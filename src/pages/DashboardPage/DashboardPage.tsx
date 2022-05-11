@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import { EventsContext } from "../../context/eventsContext";
-import { TodoContext } from "../../context/tasksContext";
+import { TasksContext } from "../../context/tasksContext";
 import { EventsContextType, IEvent } from "../../types/eventsTypes";
-import { ITask, TodoContextType } from "../../types/tasksTypes";
+import { ITask, TasksContextType } from "../../types/tasksTypes";
 import DeleteForm from "../../components/DeleteForn/DeleteForm";
 import DialogForm from "../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm";
 import AddTaskIcon from '@mui/icons-material/AddTask';
@@ -12,11 +12,11 @@ import FiltersDashboardTable from "../../components/FiltersDashboardTable/Filter
 import ItemsTable from "../../components/ItemsTable/ItemsTable";
 import { ItemFormContext } from "../../context/itemFormContext";
 import { DeleteItemFormContextType, ItemFormContextType } from "../../types/generalTypes";
-import { DeleteItemFormContext } from "../../context/DeleteItemFormContext";
+import { DeleteItemFormContext } from "../../context/deleteItemFormContext";
 import './DashboardPage.css';
 
 const DashboardPage = () => {
-    const { tasks, deleteToDo } = useContext(TodoContext) as TodoContextType;
+    const { tasks, deleteTask } = useContext(TasksContext) as TasksContextType;
     let { events, deleteEvent } = useContext(EventsContext) as EventsContextType;
     const [data, setData] = useState<(ITask | IEvent)[]>([...filterTodaysEvents(events), ...filterTodaysTasks(tasks)]);
     const [search, setSearch] = useState<string>("");
@@ -29,7 +29,7 @@ const DashboardPage = () => {
 
     const handleDelete = (item: IEvent | ITask) => {
         "priority" in item ?
-            deleteToDo(item.id) : deleteEvent(item.id);
+            deleteTask(item.id) : deleteEvent(item.id);
         handleCloseDeleteDialog();
     }
 

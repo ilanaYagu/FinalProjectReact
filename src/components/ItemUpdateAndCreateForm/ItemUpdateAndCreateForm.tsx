@@ -10,14 +10,14 @@ import validator from "validator";
 import { Autocomplete, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import { IPriority, IStatus, ITask, TodoContextType } from '../../types/tasksTypes';
+import { IPriority, IStatus, ITask, TasksContextType } from '../../types/tasksTypes';
 import { priorityOptions, statusesOptions } from '../../constants/constants';
-import { TodoContext } from '../../context/tasksContext';
+import { TasksContext } from '../../context/tasksContext';
 import { EventsContextType, IEvent } from '../../types/eventsTypes';
 import { Color, ColorPicker, createColor } from 'material-ui-color';
 import { EventsContext } from '../../context/eventsContext';
 import './ItemUpdateAndCreateForm.css';
-import { BasicType, ItemFormContextType, ItemFormType } from '../../types/generalTypes';
+import { IBasicType, ItemFormContextType, ItemFormType } from '../../types/generalTypes';
 import InvitedGuestsFiled from './InvitedGuestsFiled';
 import { ItemFormContext } from '../../context/itemFormContext';
 
@@ -37,11 +37,11 @@ const useStyles = makeStyles(() => ({
 
 const DialogForm = ({ type, choose }: DialogFormProps) => {
     const classes = useStyles();
-    const { addToDo, updateTodo, getTask } = useContext(TodoContext) as TodoContextType;
+    const { addTask, updateTask, getTask } = useContext(TasksContext) as TasksContextType;
     const { addEvent, updateEvent, getEvent } = useContext(EventsContext) as EventsContextType;
     const { handleCloseDialog, itemToUpdate } = useContext(ItemFormContext) as ItemFormContextType;
 
-    let [sharedInputs, setSharedInputs] = useState<BasicType>({
+    let [sharedInputs, setSharedInputs] = useState<IBasicType>({
         title: "",
         id: "",
         description: "",
@@ -88,13 +88,13 @@ const DialogForm = ({ type, choose }: DialogFormProps) => {
         if (isValidFileds()) {
             if (!itemToUpdate) {
                 formType === "Task" ?
-                    addToDo({ ...taskInputs, ...sharedInputs }) :
+                    addTask({ ...taskInputs, ...sharedInputs }) :
                     addEvent({ ...eventInputs, ...sharedInputs });
                 handleCloseDialog();
             }
             else {
                 formType === "Task" ?
-                    updateTodo({ ...taskInputs, ...sharedInputs }) :
+                    updateTask({ ...taskInputs, ...sharedInputs }) :
                     updateEvent({ ...eventInputs, ...sharedInputs });
                 handleCloseDialog();
             }

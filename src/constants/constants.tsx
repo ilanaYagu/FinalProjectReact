@@ -8,7 +8,7 @@ import Brightness1RoundedIcon from '@mui/icons-material/Brightness1Rounded';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import { green, pink } from "@mui/material/colors";
-import { IEvent } from "../types/eventsTypes";
+import { IBeginningTimeEventFilterOption, IEvent } from "../types/eventsTypes";
 import { TableHeaders } from "../types/generalTypes";
 
 
@@ -113,3 +113,5 @@ export const filterTodaysEvents = (events: IEvent[]) => {
         return false;
     });
 }
+
+export const BeginningTimeEventOptions: IBeginningTimeEventFilterOption[] = ['Events For Today', 'Future Events']

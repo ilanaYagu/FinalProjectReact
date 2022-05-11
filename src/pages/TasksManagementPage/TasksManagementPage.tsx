@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
-import { ITask, TodoContextType } from '../../types/tasksTypes';
+import { ITask, TasksContextType } from '../../types/tasksTypes';
 import Button from "@mui/material/Button";
 import { Box, TextField } from '@mui/material';
-import { TodoContext } from '../../context/tasksContext';
+import { TasksContext } from '../../context/tasksContext';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FiltersTasksTable from '../../components/FiltersTasksTable/FiltersTasksTable';
 import DeleteForm from '../../components/DeleteForn/DeleteForm';
@@ -11,18 +11,18 @@ import ItemsTable from '../../components/ItemsTable/ItemsTable';
 import DialogForm from '../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm';
 import { DeleteItemFormContextType, ItemFormContextType } from '../../types/generalTypes';
 import { ItemFormContext } from '../../context/itemFormContext';
-import { DeleteItemFormContext } from '../../context/DeleteItemFormContext';
+import { DeleteItemFormContext } from '../../context/deleteItemFormContext';
 import './TasksManagementPage.css';
 
 const TasksManagementPage = () => {
-    const { tasks, deleteToDo } = useContext(TodoContext) as TodoContextType;
+    const { tasks, deleteTask } = useContext(TasksContext) as TasksContextType;
     const [dataTable, setDataTable] = useState<ITask[]>(tasks);
     const [search, setSearch] = useState<string>("");
     const { isFormDialogOpen, handleOpenCreateForm, handleOpenUpdateForm } = useContext(ItemFormContext) as ItemFormContextType;
     const { isDeleteDialogOpen, itemToDelete, handleOpenDeleteDialog, handleCloseDeleteDialog } = useContext(DeleteItemFormContext) as DeleteItemFormContextType;
 
     const handleDelete = (item: ITask) => {
-        deleteToDo(item.id);
+        deleteTask(item.id);
         handleCloseDeleteDialog();
     }
 

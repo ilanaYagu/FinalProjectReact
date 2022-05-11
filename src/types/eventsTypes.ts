@@ -1,7 +1,7 @@
 import { Color } from "mui-color";
-import { BasicType } from "./generalTypes";
+import { IBasicType } from "./generalTypes";
 
-export interface IEvent extends BasicType {
+export interface IEvent extends IBasicType {
     beginningTime: string;
     endingTime: string;
     color: Color;
@@ -19,12 +19,11 @@ export type EventsContextType = {
 };
 
 
-export type BeginningTimeEventFilterOption = 'Events For Today' | 'Future Events' | "";
+export type IBeginningTimeEventFilterOption = 'Events For Today' | 'Future Events' | "";
 
 
 export interface IBeginningTimeEventFilter {
-    selectedBeginningTimeEvent: BeginningTimeEventFilterOption
+    selectedBeginningTimeEvent: IBeginningTimeEventFilterOption
 }
 
-export const BeginningTimeEventOptions: BeginningTimeEventFilterOption[] = ['Events For Today', 'Future Events']
 

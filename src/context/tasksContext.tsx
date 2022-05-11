@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { TodoContextType, ITask } from '../types/tasksTypes';
+import { TasksContextType, ITask } from '../types/tasksTypes';
 
-export const TodoContext = React.createContext<TodoContextType | null>(null);
+export const TasksContext = React.createContext<TasksContextType | null>(null);
 
-const TodoProvider: React.FC<React.ReactNode> = ({ children }) => {
+const TasksProvider: React.FC<React.ReactNode> = ({ children }) => {
     let [tasks, setTasks] = React.useState<ITask[]>([
         {
             id: "1",
@@ -32,41 +32,39 @@ const TodoProvider: React.FC<React.ReactNode> = ({ children }) => {
             untilDate: "2022-05-08 23:15"
         }
     ]);
-    const addToDo = (newTodo: ITask) => {
-        setTasks([...tasks, newTodo]);
+    const addTask = (newTask: ITask) => {
+        setTasks([...tasks, newTask]);
     };
-    const updateTodo = (todo: ITask) => {
+    const updateTask = (taskToUpdate: ITask) => {
         let i: number;
         const temp = [...tasks];
-
         for (i = 0; i < temp.length; i++) {
-            if (temp[i].id === todo.id) {
-                temp[i] = todo;
-                console.log(temp[i])
+            if (temp[i].id === taskToUpdate.id) {
+                temp[i] = taskToUpdate;
             }
         }
         setTasks(temp);
     };
 
-    const deleteToDo = (id: string) => {
+    const deleteTask = (id: string) => {
 
-        const newTodoArr: ITask[] = tasks.filter((task, index) => {
+        const newTasksArr: ITask[] = tasks.filter((task, index) => {
             return task.id !== id
         });
-        setTasks(newTodoArr);
+        setTasks(newTasksArr);
     }
 
     const getTask = (id: string): ITask | null => {
-        for (const todo of tasks) {
-            if (todo.id === id) {
-                return todo;
+        for (const task of tasks) {
+            if (task.id === id) {
+                return task;
             }
         }
         return null;
     }
 
 
-    return <TodoContext.Provider value={{ tasks, addToDo, updateTodo, deleteToDo, getTask }}>{children}</TodoContext.Provider>;
+    return <TasksContext.Provider value={{ tasks, addTask, updateTask, deleteTask, getTask }}>{children}</TasksContext.Provider>;
 };
 
-export default TodoProvider;
+export default TasksProvider;
