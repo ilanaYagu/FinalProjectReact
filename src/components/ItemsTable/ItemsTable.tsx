@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
     IconButton,
     Table,
@@ -11,7 +11,8 @@ import {
 import { DragDropContext, Draggable, DraggableProvided, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import './GenericTable.css';
+import { CustomRenderers, ItemFormContextType, MinTableItem, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
+import './ItemsTable.css';
 
 function objectValues<T extends {}>(obj: T) {
     return Object.keys(obj).map((objKey) => obj[objKey as keyof T]);
@@ -21,31 +22,22 @@ function objectKeys<T extends {}>(obj: T) {
     return Object.keys(obj).map((objKey) => objKey as keyof T);
 }
 
-interface MinTableItem {
-    id: string;
-}
-type TableHeaders<T extends MinTableItem> = Record<keyof T, string> | Record<string, string>;
-type otherColumnProperties<T> = Record<keyof T, string> | Record<string, string>;
-type CustomRenderers<T extends MinTableItem> = Partial<
-    Record<keyof T | string, (it: T) => React.ReactNode>
->;
-
-interface TableProps<T extends MinTableItem> {
+interface ItemsTableProps<T extends MinTableItem> {
     items: T[];
     headers: TableHeaders<T>;
     customRenderers?: CustomRenderers<T>;
     otherColumn?: otherColumnProperties<T>;
     deleteItem(item: T): void;
-    editItem(item: T): void;
+    editItem(item?: T): void;
     search: string;
     searchableProperties: (keyof T)[];
 }
 
-export default function GenericTable<T extends MinTableItem>(props: TableProps<T>) {
+export default function ItemsTable<T extends MinTableItem>(props: ItemsTableProps<T>) {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    const handleChangePage = (event: unknown, newPage: number) => {
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
         setPage(newPage);
     };
 

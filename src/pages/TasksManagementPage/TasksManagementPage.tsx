@@ -1,56 +1,30 @@
 import React, { useContext, useState } from 'react';
-import { Actions, ITask, TodoContextType } from '../../types/tasksTypes';
+import { ITask, TodoContextType } from '../../types/tasksTypes';
 import Button from "@mui/material/Button";
 import { Box, TextField } from '@mui/material';
 import { TodoContext } from '../../context/tasksContext';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-import FiltersTasksTable from '../../components/Tasks/FilterTasksTable/FilterTasksTable';
-import DeleteForm from '../../components/shared/DeleteForn/DeleteForm';
+import FiltersTasksTable from '../../components/FiltersTasksTable/FiltersTasksTable';
+import DeleteForm from '../../components/DeleteForn/DeleteForm';
 import { columnsForTasksTable, customRenderers, otherColumnForTasksTable } from '../../constants/constants';
-import GenericTable from '../../components/GenericTable/GenericTable';
+import ItemsTable from '../../components/ItemsTable/ItemsTable';
+import DialogForm from '../../components/ItemUpdateAndCreateForm/ItemUpdateAndCreateForm';
+import { DeleteItemFormContextType, ItemFormContextType } from '../../types/generalTypes';
+import { ItemFormContext } from '../../context/itemFormContext';
+import { DeleteItemFormContext } from '../../context/DeleteItemFormContext';
 import './TasksManagementPage.css';
-import DialogForm from '../../components/DialogForm/DialogForm';
 
 const TasksManagementPage = () => {
-    const { todos, deleteToDo } = useContext(TodoContext) as TodoContextType;
-    const [tasks, setTasks] = useState<ITask[]>(todos);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-    const [itemToUpdate, setItemToUpdate] = useState<ITask | "">("");
-    const [itemToDelete, setItemToDelete] = useState<"" | ITask>("");
-    const [action, setAction] = useState(Actions.Create);
-    const [search, setSearch] = React.useState("");
+    const { tasks, deleteToDo } = useContext(TodoContext) as TodoContextType;
+    const [dataTable, setDataTable] = useState<ITask[]>(tasks);
+    const [search, setSearch] = useState<string>("");
+    const { isFormDialogOpen, handleOpenCreateForm, handleOpenUpdateForm } = useContext(ItemFormContext) as ItemFormContextType;
+    const { isDeleteDialogOpen, itemToDelete, handleOpenDeleteDialog, handleCloseDeleteDialog } = useContext(DeleteItemFormContext) as DeleteItemFormContextType;
 
-    const handleCloseDialog = () => {
-        setIsFormDialogOpen(false);
-        setAction(Actions.Create);
-        setItemToUpdate("");
-    };
-
-    const handleOpenDialog = (item: ITask) => {
-        setIsFormDialogOpen(true);
-        setItemToUpdate(item);
-        setAction(Actions.UPDATE);
-    };
-
-    const handleOpenCreateDialog = () => {
-        setIsFormDialogOpen(true);
-    }
-
-    const handleOpenDeleteDialog = (item: ITask) => {
-        setIsDeleteDialogOpen(true);
-        setItemToDelete(item);
-    };
-
-    const handleCloseDeleteDialog = () => {
-        setIsDeleteDialogOpen(false);
-        setItemToDelete("");
-    };
     const handleDelete = (item: ITask) => {
         deleteToDo(item.id);
         handleCloseDeleteDialog();
     }
-
 
     return (
         <Box component="main">
@@ -60,27 +34,27 @@ const TasksManagementPage = () => {
             <Button
                 variant="contained"
                 id='addTaskButton'
-                onClick={handleOpenCreateDialog} startIcon={<AddTaskIcon />}>
+                onClick={handleOpenCreateForm} startIcon={<AddTaskIcon />}>
                 Add Task
             </Button>
-            <FiltersTasksTable setTasks={setTasks} />
-            <h4>Total num of tasks: {todos.length}</h4>
-            {isFormDialogOpen &&
-                <DialogForm type="Task" handleCloseDialog={handleCloseDialog} action={action} itm={itemToUpdate ? itemToUpdate : undefined} />}
+            <FiltersTasksTable setTasks={setDataTable} />
+            <h4>Total num of tasks: {tasks.length}</h4>
 
-            <GenericTable
+            {isFormDialogOpen &&
+                <DialogForm type="Task" />}
+
+            <ItemsTable
                 headers={columnsForTasksTable}
                 otherColumn={otherColumnForTasksTable}
-                items={tasks}
+                items={dataTable}
                 customRenderers={customRenderers}
                 deleteItem={handleOpenDeleteDialog}
-                editItem={handleOpenDialog}
+                editItem={handleOpenUpdateForm}
                 search={search}
                 searchableProperties={["title"]}
-
             />
             {isDeleteDialogOpen &&
-                <DeleteForm handleCloseDeleteTaskDialog={handleCloseDeleteDialog} item={itemToDelete} handleDelete={handleDelete} />}
+                <DeleteForm item={itemToDelete} handleDelete={handleDelete} />}
         </Box>
     );
 };

@@ -14,3 +14,11 @@ button {
 #chooseTypeTitle {
     margin-right: 15px;
 }
+
+.ColorPicker-MuiInputBase-input {
+    color: aliceblue !important;
+}
+
+.ColorPicker-MuiInput-underline:before {
+    border-bottom: 1px solid rgba(228, 218, 218, 0.42) !important;
+}

@@ -1,47 +1,35 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { IPriority, IStatus, ITask, TodoContextType } from '../../../types/tasksTypes';
+import { IPriority, IStatus, ITask, ITasksFilter, TodoContextType } from '../../types/tasksTypes';
 import { Box, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { TodoContext } from '../../../context/tasksContext';
-import { priorityOptions, statusesOptions } from '../../../constants/constants';
+import { TodoContext } from '../../context/tasksContext';
+import { priorityOptions, statusesOptions } from '../../constants/constants';
 
 interface FiltersTasksTableProps {
     setTasks(newTasks: ITask[]): void;
 }
 
 const FiltersTasksTable = ({ setTasks }: FiltersTasksTableProps) => {
-    const { todos } = useContext(TodoContext) as TodoContextType;
+    const { tasks } = useContext(TodoContext) as TodoContextType;
 
-    const [filters, setFilters] = useState({
+    const [filters, setFilters] = useState<ITasksFilter>({
         selectedFilterStatus: "",
         selectedFilterPriority: "",
     });
 
     useEffect(() => {
-        setTasks(todos.filter((item: ITask) => {
+        setTasks(tasks.filter((item: ITask) => {
             return (item.priority === filters.selectedFilterPriority || filters.selectedFilterPriority === "")
                 && (item.status === filters.selectedFilterStatus || filters.selectedFilterStatus === "")
         }));
-    }, [todos])
-
-
-    useEffect(() => {
-        setTasks(todos.filter((item: ITask) => {
-            return (item.priority === filters.selectedFilterPriority || filters.selectedFilterPriority === "")
-                && (item.status === filters.selectedFilterStatus || filters.selectedFilterStatus === "")
-        }));
-        console.log("changed")
-    }, [filters, todos])
-
-
+    }, [filters, tasks])
 
     return (
         <Box display="flex" style={{ marginTop: 20 }}>
             <div>Quick Filters:</div>
-
             <Select
                 style={{ width: "12%", height: "40px", marginLeft: "9px", marginRight: "9px" }}
                 value={filters.selectedFilterStatus}
-                onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, selectedFilterStatus: event.target.value })}
+                onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, selectedFilterStatus: event.target.value as IStatus })}
                 name="status"
                 displayEmpty
             >
@@ -54,7 +42,7 @@ const FiltersTasksTable = ({ setTasks }: FiltersTasksTableProps) => {
             <Select
                 style={{ width: "12%", height: "40px", marginLeft: "9px", marginRight: "9px" }}
                 value={filters.selectedFilterPriority}
-                onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, selectedFilterPriority: event.target.value })}
+                onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, selectedFilterPriority: event.target.value as IPriority })}
                 name="priority"
                 displayEmpty
             >

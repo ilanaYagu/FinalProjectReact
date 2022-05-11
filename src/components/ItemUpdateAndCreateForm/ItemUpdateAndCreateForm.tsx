@@ -10,23 +10,21 @@ import validator from "validator";
 import { Autocomplete, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import { Actions, IPriority, IStatus, ITask, TodoContextType } from '../../types/tasksTypes';
+import { IPriority, IStatus, ITask, TodoContextType } from '../../types/tasksTypes';
 import { priorityOptions, statusesOptions } from '../../constants/constants';
 import { TodoContext } from '../../context/tasksContext';
 import { EventsContextType, IEvent } from '../../types/eventsTypes';
 import { Color, ColorPicker, createColor } from 'material-ui-color';
 import { EventsContext } from '../../context/eventsContext';
-import './DialogForm.css';
+import './ItemUpdateAndCreateForm.css';
+import { BasicType, ItemFormContextType, ItemFormType } from '../../types/generalTypes';
+import InvitedGuestsFiled from './InvitedGuestsFiled';
+import { ItemFormContext } from '../../context/itemFormContext';
 
-type DialogType = "Task" | "Event";
-
-const optionsDialogType: DialogType[] = ["Task", "Event"];
+const optionsDialogType: ItemFormType[] = ["Task", "Event"];
 
 interface DialogFormProps {
-    action: Actions.Create | Actions.UPDATE;
-    itm?: ITask | IEvent;
-    handleCloseDialog(): void;
-    type: DialogType;
+    type: ItemFormType;
     choose?: boolean;
 }
 
@@ -37,25 +35,18 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogFormProps) => {
+const DialogForm = ({ type, choose }: DialogFormProps) => {
     const classes = useStyles();
     const { addToDo, updateTodo, getTask } = useContext(TodoContext) as TodoContextType;
     const { addEvent, updateEvent, getEvent } = useContext(EventsContext) as EventsContextType;
+    const { handleCloseDialog, itemToUpdate } = useContext(ItemFormContext) as ItemFormContextType;
 
-
-    let [sharedInputs, setSharedInputs] = useState({
+    let [sharedInputs, setSharedInputs] = useState<BasicType>({
         title: "",
         id: "",
         description: "",
     })
-    let [taskInputs, setTaskInputs] = useState<{
-        estimatedTime: string,
-        status: string,
-        priority: IPriority,
-        review?: string,
-        timeSpent?: string,
-        untilDate?: string
-    }>({
+    let [taskInputs, setTaskInputs] = useState<Omit<ITask, "id" | "title" | "description">>({
         status: "Open",
         estimatedTime: "",
         priority: "Low",
@@ -63,66 +54,70 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
         timeSpent: "",
         untilDate: "",
     });
-    let [eventInputs, setEventInputs] = useState<{
-        beginningTime: string;
-        endingTime: string;
-        color: Color;
-        location: string;
-        notificationTime?: string;
-    }>({
+    let [eventInputs, setEventInputs] = useState<Omit<IEvent, "id" | "title" | "description">>({
         beginningTime: "",
         endingTime: "",
         color: createColor("red"),
         location: "",
-        notificationTime: ""
+        notificationTime: "",
+        invitedGuests: []
     })
-    let [dialogTitle, setDialogTitle] = useState("");
-    let [buttonText, setButtonText] = useState("");
-    let [typeDialog, setTypeDialog] = useState<DialogType>(type);
-
-    let [disabled, setDisabled] = useState(false);
+    let [buttonText, setButtonText] = useState<string>("");
+    let [formType, setFormType] = useState<ItemFormType>(type);
+    let [disabled, setDisabled] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log("update")
-        if (action === Actions.Create) {
+        if (!itemToUpdate) {
             setButtonText("Create");
-        }
-        if (action === Actions.UPDATE && itm) {
+        } else {
             setButtonText("Update");
-            let item: ITask | IEvent | null = typeDialog === "Task" ? getTask(itm.id) : getEvent(itm.id);
+            let item: ITask | IEvent | null = formType === "Task" ? getTask(itemToUpdate.id) : getEvent(itemToUpdate.id);
             setDisabled(true);
             if (item) {
                 setSharedInputs({ ...sharedInputs, id: item.id, title: item.title, description: item.description });
                 ("priority" in item) ?
                     setTaskInputs({ ...taskInputs, status: item.status, estimatedTime: item.estimatedTime, priority: item.priority, timeSpent: item.timeSpent, untilDate: item.untilDate, review: item.review })
                     :
-                    setEventInputs({ ...eventInputs, color: item.color, beginningTime: item.beginningTime, endingTime: item.endingTime, location: item.location, notificationTime: item.notificationTime })
+                    setEventInputs({ ...eventInputs, color: item.color, beginningTime: item.beginningTime, endingTime: item.endingTime, location: item.location, notificationTime: item.notificationTime, invitedGuests: item.invitedGuests })
             }
         }
-    }, [action, itm]);
-
+    }, [itemToUpdate]);
 
     const formSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
+        if (isValidFileds()) {
+            if (!itemToUpdate) {
+                formType === "Task" ?
+                    addToDo({ ...taskInputs, ...sharedInputs }) :
+                    addEvent({ ...eventInputs, ...sharedInputs });
+                handleCloseDialog();
+            }
+            else {
+                formType === "Task" ?
+                    updateTodo({ ...taskInputs, ...sharedInputs }) :
+                    updateEvent({ ...eventInputs, ...sharedInputs });
+                handleCloseDialog();
+            }
+        }
+    }
+
+    const isValidFileds = () => {
+        let isValid = false;
         if (
             validator.trim(sharedInputs.id) === "" ||
             validator.trim(sharedInputs.title) === "" ||
             validator.trim(sharedInputs.description) === "" ||
-            validator.trim(taskInputs.status) === ""
+            type === "Event" && validator.trim(eventInputs.beginningTime) === "" ||
+            type === "Event" && validator.trim(eventInputs.endingTime) === ""
         ) {
             alert("Please fill the Required Fields");
         }
-        if (action === Actions.Create) {
-            typeDialog === "Task" ?
-                addToDo({ ...taskInputs, ...sharedInputs }) :
-                addEvent({ ...eventInputs, ...sharedInputs });
+        else if (type === "Event" && new Date(eventInputs.beginningTime) > new Date(eventInputs.endingTime)) {
+            alert("Please check your beginning and ending times");
+        } else {
+            isValid = true;
         }
-        if (action === Actions.UPDATE && itm) {
-            typeDialog === "Task" ?
-                updateTodo({ ...taskInputs, ...sharedInputs }) :
-                updateEvent({ ...eventInputs, ...sharedInputs });
-        }
-        handleCloseDialog();
+        return isValid;
     }
 
     const renderTaskDetails = () => {
@@ -134,7 +129,10 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
                     defaultValue={taskInputs.status}
                     disableClearable
                     options={statusesOptions.map((option: IStatus) => option)}
-                    onChange={(event: React.FormEvent) => setTaskInputs({ ...taskInputs, status: (event.target as HTMLInputElement).textContent as IStatus })}
+                    onChange={(event: React.FormEvent) => {
+                        const newStatus = (event.target as HTMLInputElement).textContent as IStatus;
+                        setTaskInputs({ ...taskInputs, status: newStatus, review: newStatus !== "Done" ? "" : taskInputs.review })
+                    }}
 
                     renderInput={(params) => (
                         <TextField
@@ -159,7 +157,10 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
                     defaultValue={taskInputs.priority}
                     disableClearable
                     options={priorityOptions.map((option: IPriority) => option)}
-                    onChange={(event: React.FormEvent) => setTaskInputs({ ...taskInputs, priority: (event.target as HTMLInputElement).textContent as IPriority })}
+                    onChange={(event: React.FormEvent) => {
+                        const newPriority = (event.target as HTMLInputElement).textContent as IPriority;
+                        setTaskInputs({ ...taskInputs, priority: newPriority, untilDate: newPriority !== "Top" ? "" : taskInputs.untilDate })
+                    }}
                     renderInput={(params) => (
                         <TextField
                             {...params}
@@ -257,6 +258,13 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
                     }}
                 />
             </div>
+            <div>
+                <TextField id="location" label="Location" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEventInputs({ ...eventInputs, location: event.target.value })} defaultValue={eventInputs.location} />
+            </div>
+            <div>
+                Invited Guests:
+                <InvitedGuestsFiled invitedGuests={eventInputs.invitedGuests} setInvitedGuests={(newInvitedGuests: string[]) => setEventInputs({ ...eventInputs, invitedGuests: newInvitedGuests })} />
+            </div>
         </div>
     }
 
@@ -273,7 +281,7 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
             classes={{ paper: classes.dialog }}
 
         >
-            <DialogTitle id="form-dialog-title">{buttonText + " " + typeDialog} </DialogTitle>
+            <DialogTitle id="form-dialog-title">{buttonText + " " + formType} </DialogTitle>
             <form onSubmit={formSubmit} noValidate autoComplete="off">
                 <DialogContent>
                     <DialogContentText> Details: </DialogContentText>
@@ -287,10 +295,10 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
                                 <Select
                                     labelId="typeD"
                                     id="typeD"
-                                    value={typeDialog}
+                                    value={formType}
                                     label="Type"
                                     onChange={(event: SelectChangeEvent<string>) =>
-                                        setTypeDialog(event.target.value as DialogType)
+                                        setFormType(event.target.value as ItemFormType)
                                     }
                                 >
                                     {
@@ -309,7 +317,7 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
                             <TextField id="title" label="Title" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSharedInputs({ ...sharedInputs, title: event.target.value })} defaultValue={sharedInputs.title} required />
                         </div>
 
-                        <div>Description: <br />
+                        <div>Description * : <br />
                             <TextareaAutosize
                                 id="description"
                                 placeholder="Enter desc..."
@@ -319,7 +327,7 @@ const DialogForm = ({ action, itm, handleCloseDialog, type, choose }: DialogForm
                                 required />
                         </div>
                         {
-                            typeDialog === "Task" ?
+                            formType === "Task" ?
                                 renderTaskDetails()
                                 : renderEventDetails()
                         }

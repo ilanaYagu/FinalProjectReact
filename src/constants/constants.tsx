@@ -9,19 +9,21 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import { green, pink } from "@mui/material/colors";
 import { IEvent } from "../types/eventsTypes";
+import { TableHeaders } from "../types/generalTypes";
 
-export const columnsForTasksTable = {
+
+export const columnsForTasksTable: TableHeaders<ITask> = {
     type: "Type",
     priority: "Priority",
     title: "Title",
     status: "Status",
+    estimatedTime: "Estimated Time",
     other: "Other",
     actions: "Actions"
 };
 
 export const otherColumnForTasksTable = {
     untilDate: "Until Date",
-    estimatedTime: "Estimated Date",
     timeSpent: "Time Spent"
 };
 
@@ -34,11 +36,12 @@ export const columnsForTodayTasksAndEventsTable = {
 };
 
 export const otherColumnForTodayTasksAndEventsTable = {
+    status: "Status",
     untilDate: "Until Date",
-    beginningTime: "Beginning Time",
-    endingTime: "Ending Time",
+    beginningTime: "From",
+    endingTime: "Until",
     estimatedTime: "Estimated Time",
-    location: "location"
+    location: "Location"
 };
 
 export const columnsForEventsTable = {
@@ -79,7 +82,34 @@ export const customRenderers = {
 }
 
 export const customRenderersEvents = {
-    color: (it: IEvent) => (
+    color: (it: IEvent | ITask) => (
+        "color" in it &&
         <Brightness1RoundedIcon sx={{ color: "#" + it.color.hex }} />
     )
+}
+
+export const filterTodaysTasks = (tasks: ITask[]) => {
+    return tasks.filter((task) => {
+        if (task.untilDate) {
+            const today = new Date();
+            const untilDate = new Date(task.untilDate);
+            return untilDate.getDate() == today.getDate() &&
+                untilDate.getMonth() == today.getMonth() &&
+                untilDate.getFullYear() == today.getFullYear()
+        }
+        return false;
+    });
+}
+
+export const filterTodaysEvents = (events: IEvent[]) => {
+    return events.filter((event) => {
+        if (event.beginningTime) {
+            const today = new Date();
+            const beginningTime = new Date(event.beginningTime);
+            return beginningTime.getDate() == today.getDate() &&
+                beginningTime.getMonth() == today.getMonth() &&
+                beginningTime.getFullYear() == today.getFullYear()
+        }
+        return false;
+    });
 }

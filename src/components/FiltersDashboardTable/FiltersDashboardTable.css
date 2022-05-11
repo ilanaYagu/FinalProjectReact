@@ -1,8 +1,13 @@
 .filterButton {
-    background-color: rgb(68, 46, 64) !important;
+    background-color: #442e40;
+
     margin-right: 10px !important;
     margin-left: 10px;
     font-size: small !important;
+}
+
+.active {
+    background-color: #b599b0 !important;
 }
 
 #titleFilterBox {

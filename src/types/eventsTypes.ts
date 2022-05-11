@@ -1,14 +1,13 @@
 import { Color } from "mui-color";
+import { BasicType } from "./generalTypes";
 
-export interface IEvent {
-    id: string;
-    title: string;
-    description: string;
+export interface IEvent extends BasicType {
     beginningTime: string;
     endingTime: string;
     color: Color;
     location: string;
     notificationTime?: string;
+    invitedGuests?: string[];
 }
 
 export type EventsContextType = {

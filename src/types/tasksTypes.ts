@@ -1,7 +1,6 @@
-export interface ITask {
-    id: string;
-    title: string;
-    description: string;
+import { BasicType } from "./generalTypes";
+
+export interface ITask extends BasicType {
     estimatedTime: string;
     status: string;
     priority: IPriority;
@@ -15,7 +14,7 @@ export type IPriority = "Low" | "Regular" | "Top";
 export type IStatus = 'Open' | 'In Progress' | 'Done';
 
 export type TodoContextType = {
-    todos: ITask[];
+    tasks: ITask[];
     addToDo: (todo: ITask) => void;
     deleteToDo: (id: string) => void;
     updateTodo: (todo: ITask) => void;
@@ -29,4 +28,9 @@ export enum Actions {
     Create = 0,
     UPDATE = 1
 };
+
+export interface ITasksFilter {
+    selectedFilterStatus: IStatus | "",
+    selectedFilterPriority: IPriority | "",
+}
 

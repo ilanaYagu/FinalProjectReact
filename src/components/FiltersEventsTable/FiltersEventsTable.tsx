@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { EventsContext } from '../../../context/eventsContext';
-import { BeginningTimeEventFilterOption, BeginningTimeEventOptions, EventsContextType, IBeginningTimeEventFilter, IEvent } from '../../../types/eventsTypes';
+import { EventsContext } from '../../context/eventsContext';
+import { BeginningTimeEventFilterOption, BeginningTimeEventOptions, EventsContextType, IBeginningTimeEventFilter, IEvent } from '../../types/eventsTypes';
 
 interface FiltersEventsTableProps {
     setEvents(newTasks: IEvent[]): void;

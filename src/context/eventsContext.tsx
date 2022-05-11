@@ -12,9 +12,9 @@ const EventsProvider: React.FC<React.ReactNode> = ({ children }) => {
             description: 'The doctor ask me to call him one day before the appointment.',
             beginningTime: '2022-07-09 12:23',
             endingTime: '2022-07-09 13:23',
-            color: createColor("red"),
-            location: "-"
-
+            color: createColor("#C88383"),
+            location: "Ashkelon, the clinic of Yosof",
+            invitedGuests: ["Michal Grinborg", "Ron C.", "Ilanit"]
         },
         {
             id: "2",
@@ -22,8 +22,9 @@ const EventsProvider: React.FC<React.ReactNode> = ({ children }) => {
             description: 'this is a description',
             beginningTime: '2025-09-12 19:30',
             endingTime: '2025-09-13 05:45',
-            color: createColor("green"),
-            location: "-"
+            color: createColor("#7EA87E"),
+            location: "Paris",
+            invitedGuests: ["Shai", "Ronit", "Hen Levis", "Sholamit"]
         },
     ]);
     const addEvent = (newEvent: IEvent) => {
