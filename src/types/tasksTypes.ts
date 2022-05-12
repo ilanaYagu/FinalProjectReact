@@ -2,7 +2,7 @@ import { IBasicType } from "./generalTypes";
 
 export interface ITask extends IBasicType {
     estimatedTime: string;
-    status: string;
+    status: IStatus;
     priority: IPriority;
     review?: string;
     timeSpent?: string;

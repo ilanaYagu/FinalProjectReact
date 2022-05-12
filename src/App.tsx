@@ -1,7 +1,7 @@
 import * as React from 'react';
 import TasksProvider from './context/tasksContext';
 import TasksManagementPage from './pages/TasksManagementPage/TasksManagementPage';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
 import EventsManagementPage from './pages/EventsManagementPage/EventsManagementPage';
 import { NavBarSide } from './components/NavBarSide/NavBarSide';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -12,8 +12,7 @@ import DashboardPage from './pages/DashboardPage/DashboardPage';
 import ItemFormProvider from './context/itemFormContext';
 import DeleteItemFormProvider from './context/deleteItemFormContext';
 
-export default function App() {
-
+const App = () => {
   const theme = createTheme({
     palette: {
       mode: "dark",
@@ -49,6 +48,7 @@ export default function App() {
                   <Route path="/tasks" element={<TasksManagementPage />} />
                   <Route path="/events" element={<EventsManagementPage />} />
                   <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
                 <NavBarSide />
               </Router>
@@ -60,3 +60,5 @@ export default function App() {
 
   )
 }
+
+export default App;

@@ -12,7 +12,7 @@ const TasksProvider: React.FC<React.ReactNode> = ({ children }) => {
             status: "In Progress",
             priority: "Top",
             estimatedTime: "3d",
-            untilDate: "2022-05-11 21:00"
+            untilDate: "2022-05-12 21:00"
         },
         {
             id: "2",
@@ -23,13 +23,24 @@ const TasksProvider: React.FC<React.ReactNode> = ({ children }) => {
             estimatedTime: "1w"
         },
         {
-            id: "3",
-            title: 'Go to the doctor for PCR',
-            description: 'I have a meeting with the doctor before the PCR itself.',
-            status: "Dnoe",
+            id: "3983",
+            title: 'ask the teacher about the final project',
+            description: 'The questions is on my notebook in my computer.',
+            status: "Done",
             priority: "Top",
-            estimatedTime: "3d",
-            untilDate: "2022-05-08 23:15"
+            estimatedTime: "3.5d",
+            untilDate: "2022-05-12 19:00",
+            timeSpent: "10d",
+            review: "The teacher asked to send him the questions to his mail - and he answered the questions already!"
+        },
+        {
+            id: "3432",
+            title: 'Feed my cat',
+            description: 'First I need to buy the food.',
+            status: "Open",
+            priority: "Regular",
+            estimatedTime: "2d",
+            untilDate: "2022-05-30 08:00"
         }
     ]);
     const addTask = (newTask: ITask) => {

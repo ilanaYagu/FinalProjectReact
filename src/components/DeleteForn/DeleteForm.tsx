@@ -9,12 +9,12 @@ import { DeleteItemFormContext } from '../../context/deleteItemFormContext';
 import { DeleteItemFormContextType } from '../../types/generalTypes';
 
 
-interface DeleteTaskFormProps<T> {
+interface DeleteItemFormProps<T> {
     item: T;
     handleDelete(item: T): void;
 }
 
-function DeleteForm<T>({ item, handleDelete }: DeleteTaskFormProps<T>) {
+function DeleteItemForm<T>({ item, handleDelete }: DeleteItemFormProps<T>) {
     const { handleCloseDeleteDialog } = useContext(DeleteItemFormContext) as DeleteItemFormContextType;
 
     return (
@@ -37,4 +37,4 @@ function DeleteForm<T>({ item, handleDelete }: DeleteTaskFormProps<T>) {
     );
 };
 
-export default DeleteForm;
+export default DeleteItemForm;

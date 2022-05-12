@@ -10,7 +10,7 @@ const EventsProvider: React.FC<React.ReactNode> = ({ children }) => {
             id: "1",
             title: 'Vet - for my dogo',
             description: 'The doctor ask me to call him one day before the appointment.',
-            beginningTime: '2022-05-11 12:23',
+            beginningTime: '2022-05-12 12:23',
             endingTime: '2022-07-09 13:23',
             color: createColor("#C88383"),
             location: "Ashkelon, the clinic of Yosof",
@@ -19,13 +19,23 @@ const EventsProvider: React.FC<React.ReactNode> = ({ children }) => {
         {
             id: "2",
             title: 'Wedding to my bff!',
-            description: 'this is a description',
+            description: 'Need to buy a dress, and a gift of course.',
             beginningTime: '2025-09-12 19:30',
             endingTime: '2025-09-13 05:45',
             color: createColor("#7EA87E"),
             location: "Paris",
             invitedGuests: ["Shai", "Ronit", "Hen Levis", "Sholamit"]
         },
+        {
+            id: "232",
+            title: 'Meeting with the hamus organization',
+            description: 'with the highest there, like abu masen',
+            beginningTime: '2025-07-20 17:30',
+            endingTime: '2025-07-20 18:45',
+            color: createColor("#94B1A6"),
+            location: "Egypt",
+            invitedGuests: ["Ilanit Levi", "Galit Gutman", "Yunit"]
+        }
     ]);
     const addEvent = (newEvent: IEvent) => {
         setEvents([...events, newEvent]);

@@ -253,6 +253,22 @@ const ItemUpdateAndCreateForm = ({ type, enableSwitchType }: ItemUpdateAndCreate
                 />
             </div>
             <div>
+                <TextField
+                    id="endingTime"
+                    label="Notification Time"
+                    type="datetime-local"
+                    defaultValue={eventInputs.notificationTime}
+                    sx={{ width: 250 }}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    value={eventInputs.notificationTime?.replace(" ", "T")}
+                    onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+                        setEventInputs({ ...eventInputs, notificationTime: event.target.value.replace("T", " ") });
+                    }}
+                />
+            </div>
+            <div>
                 <TextField id="location" label="Location" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEventInputs({ ...eventInputs, location: event.target.value })} defaultValue={eventInputs.location} />
             </div>
             <div>
@@ -314,8 +330,8 @@ const ItemUpdateAndCreateForm = ({ type, enableSwitchType }: ItemUpdateAndCreate
                             <div>
                                 <span id="chooseTypeTitle">Choose Type:</span>
                                 <Select
-                                    labelId="typeD"
-                                    id="typeD"
+                                    labelId="type"
+                                    id="type"
                                     value={formType}
                                     label="Type"
                                     onChange={(event: SelectChangeEvent<string>) =>

@@ -1,21 +1,22 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { EventsContext } from '../../context/eventsContext';
-import { EventsContextType, IBeginningTimeEventFilter, IEvent } from '../../types/eventsTypes';
+import { EventsContextType, IEvent } from '../../types/eventsTypes';
 import { ITask, TasksContextType } from '../../types/tasksTypes';
 import { TasksContext } from '../../context/tasksContext';
-import './FiltersDashboardTable.css';
 import { filterTodaysEvents, filterTodaysTasks } from '../../constants/constants';
 import { IFilterDashboardTable } from '../../types/generalTypes';
+import './FiltersDashboardTable.css';
 
+type IItem = ITask | IEvent;
 interface FiltersDashboardTableProps {
-    setDataTable(newTasks: (IEvent | ITask)[]): void;
+    setDataTable(newData: IItem[]): void;
 }
 
 const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => {
     const { tasks } = useContext(TasksContext) as TasksContextType;
     const { events } = useContext(EventsContext) as EventsContextType;
-    const [data, setData] = useState<(ITask | IEvent)[]>([...filterTodaysEvents(events), ...filterTodaysTasks(tasks)]);
+    const [data, setData] = useState<IItem[]>([...filterTodaysEvents(events), ...filterTodaysTasks(tasks)]);
 
     const [filters, setFilters] = useState<IFilterDashboardTable[]>([
         { active: false, label: "Tasks", name: "onlyTasks" },
@@ -25,24 +26,24 @@ const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => 
     ]);
 
     useEffect(() => {
-        setDataTable(data.filter((value: IEvent | ITask) => {
+        setDataTable(data.filter((item: IItem) => {
             let isMatch = true;
-            filters.map((val: IFilterDashboardTable) => {
-                if (val.active) {
-                    switch (val.name) {
+            filters.map((filter: IFilterDashboardTable) => {
+                if (filter.active) {
+                    switch (filter.name) {
                         case "onlyTasks": {
-                            isMatch = "priority" in value;
+                            isMatch = "priority" in item;
                             break;
                         }
                         case "onlyEvents": {
-                            isMatch = !("priority" in value);
+                            isMatch = !("priority" in item);
                             break;
                         }
                         case "uncompletedTasks":
-                            isMatch = "status" in value && value.status !== "Done";
+                            isMatch = "status" in item && item.status !== "Done";
                             break;
                         case "highPriorityTasks":
-                            isMatch = "priority" in value && value.priority === "Top";
+                            isMatch = "priority" in item && item.priority === "Top";
                             break;
                     }
                 }
@@ -55,7 +56,7 @@ const FiltersDashboardTable = ({ setDataTable }: FiltersDashboardTableProps) => 
         setData([...filterTodaysEvents(events), ...filterTodaysTasks(tasks)])
     }, [events, tasks])
 
-    const onClickFilter = (filter: IFilterDashboardTable) => {
+    const onClickFilter = (filter: IFilterDashboardTable): void => {
         const newActiveStatus = !filter.active;
         const nfilters = filters.slice();
         nfilters.forEach((nfilter: IFilterDashboardTable) => {
