@@ -47,6 +47,7 @@ const TasksManagementPage = () => {
                 headers={columnsForTasksTable}
                 otherColumn={otherColumnForTasksTable}
                 items={dataTable}
+                setItems={(newItems: ITask[]) => setDataTable(newItems)}
                 customRenderers={customRenderers}
                 deleteItem={handleOpenDeleteDialog}
                 editItem={handleOpenUpdateForm}

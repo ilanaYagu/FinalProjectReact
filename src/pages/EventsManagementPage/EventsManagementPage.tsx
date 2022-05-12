@@ -43,6 +43,7 @@ const EventsManagementPage = () => {
             <ItemsTable
                 headers={columnsForEventsTable}
                 items={tableData}
+                setItems={(newItems: IEvent[]) => setTableData(newItems)}
                 customRenderers={customRenderersEvents}
                 deleteItem={handleOpenDeleteDialog}
                 editItem={handleOpenUpdateForm}

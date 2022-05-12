@@ -50,6 +50,7 @@ const DashboardPage = () => {
                 headers={columnsForTodayTasksAndEventsTable}
                 otherColumn={otherColumnForTodayTasksAndEventsTable}
                 items={data}
+                setItems={(newItems: (IEvent | ITask)[]) => setData(newItems)}
                 customRenderers={customRenderers}
                 deleteItem={handleOpenDeleteDialog}
                 editItem={handleOpenUpdateForm}

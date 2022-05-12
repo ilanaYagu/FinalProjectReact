@@ -24,7 +24,7 @@ const TasksProvider: React.FC<React.ReactNode> = ({ children }) => {
         },
         {
             id: "3983",
-            title: 'ask the teacher about the final project',
+            title: 'Ask the teacher about the final project',
             description: 'The questions is on my notebook in my computer.',
             status: "Done",
             priority: "Top",

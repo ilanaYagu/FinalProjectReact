@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { MouseEventHandler, useState } from "react";
 import {
     IconButton,
     Table,
@@ -6,7 +6,8 @@ import {
     TableCell,
     TableHead,
     TablePagination,
-    TableRow
+    TableRow,
+    TableSortLabel
 } from "@mui/material";
 import { DragDropContext, Draggable, DraggableProvided, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import EditIcon from '@mui/icons-material/Edit';
@@ -16,6 +17,7 @@ import './ItemsTable.css';
 
 interface ItemsTableProps<T extends IMinTableItem> {
     items: T[];
+    setItems(newItems: T[]): void;
     headers: TableHeaders<T>;
     customRenderers?: CustomRenderers<T>;
     otherColumn?: otherColumnProperties<T>;
@@ -25,9 +27,14 @@ interface ItemsTableProps<T extends IMinTableItem> {
     searchableProperties: (keyof T)[];
 }
 
-export default function ItemsTable<T extends IMinTableItem>(props: ItemsTableProps<T>) {
+type ISortOrder = "asc" | "desc" | undefined;
+type ISortBy<T extends IMinTableItem> = keyof TableHeaders<T> | "";
+
+export default function ItemsTable<T extends IMinTableItem>({ items, setItems, headers, customRenderers, otherColumn, deleteItem, editItem, search, searchableProperties }: ItemsTableProps<T>) {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortBy, setSortBy] = useState<ISortBy<T>>("")
+    const [sortOrder, setSortOrder] = useState<ISortOrder>(undefined)
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
         setPage(newPage);
@@ -37,6 +44,54 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
+
+    const sortData = (newSortBy: ISortBy<T>, newSortOrder: ISortOrder) => {
+        return items.sort((i: T, j: T) => {
+            if (!(newSortOrder === undefined || ["other", "actions", "type"].includes(newSortBy) || newSortBy === "")) {
+                if (!i[newSortBy] || !j[newSortBy]) {
+                    if (i[newSortBy]) {
+                        return newSortOrder === "asc" ? 1 : -1
+                    } else {
+                        return newSortOrder === "asc" ? -1 : 1;
+                    }
+                } else {
+                    if (i[newSortBy] < j[newSortBy]) {
+                        return newSortOrder === "asc" ? -1 : 1;
+                    }
+
+                    else if (i[newSortBy] > j[newSortBy]) {
+                        return newSortOrder === "asc" ? 1 : -1;
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+            }
+            return 0;
+        });
+    }
+
+    const requestSort = (pSortBy: ISortBy<T>) => {
+        let newSortOrder: ISortOrder = sortOrder;
+        let newSortBy: ISortBy<T> = sortBy;
+        return () => {
+            if (pSortBy === sortBy) {
+                if (sortOrder === "desc") {
+                    newSortOrder = "asc";
+                    newSortBy = "";
+                    setSortBy(newSortBy);
+                } else {
+                    newSortOrder = "desc"
+                }
+            } else {
+                newSortOrder = "asc";
+                newSortBy = pSortBy;
+                setSortBy(newSortBy);
+            }
+            setSortOrder(newSortOrder);
+            newSortBy && setItems(sortData(newSortBy, newSortOrder));
+        };
+    }
 
     const renderRow = (item: T, index: number) => {
         return (
@@ -55,9 +110,9 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
                             {...draggableProvided.dragHandleProps}
                         >
                             {
-                                Object.entries(props.headers).map(([headerKey]) => {
+                                Object.entries(headers).map(([headerKey]) => {
                                     if (headerKey !== "other" && headerKey !== "actions") {
-                                        const customRenderer = props.customRenderers?.[headerKey];
+                                        const customRenderer = customRenderers?.[headerKey];
                                         return <TableCell>
                                             {
                                                 customRenderer ?
@@ -70,10 +125,10 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
                                 })
                             }
                             {
-                                props.otherColumn &&
+                                otherColumn &&
                                 <TableCell>
                                     {
-                                        Object.entries(props.otherColumn).map(([key, value]) => {
+                                        Object.entries(otherColumn).map(([key, value]) => {
                                             return item[key as keyof T] ?
                                                 <div className="otherInfo">
                                                     <em>{value}</em><br /> {item[key as keyof T]}
@@ -85,10 +140,10 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
                                 </TableCell>
                             }
                             <TableCell>
-                                <IconButton aria-label="edit" id="updateTaskButton" color="primary" onClick={() => props.editItem(item)}>
+                                <IconButton aria-label="edit" id="updateTaskButton" color="primary" onClick={() => editItem(item)}>
                                     <EditIcon />
                                 </IconButton>
-                                <IconButton aria-label="delete" id="deleteTaskButton" onClick={() => props.deleteItem(item)}>
+                                <IconButton aria-label="delete" id="deleteTaskButton" onClick={() => deleteItem(item)}>
                                     <DeleteIcon />
                                 </IconButton>
                             </TableCell>
@@ -105,18 +160,18 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
         if (result.destination.index === result.source.index) {
             return;
         }
-        const temp = props.items;
+        const temp = items;
         const d = temp[result.destination!.index];
         temp[result.destination!.index] = temp[result.source.index];
         temp[result.source.index] = d;
-        props.items = temp;
+        items = temp;
     };
 
     const isMatchedWithSearchFilter = (itm: T) => {
         let isMatched = false;
-        props.searchableProperties.forEach((k: keyof T) => {
+        searchableProperties.forEach((k: keyof T) => {
             const valueToCheck: string = itm[k] as unknown as string;
-            isMatched = isMatched || valueToCheck.toLowerCase().includes(props.search.toLowerCase());
+            isMatched = isMatched || valueToCheck.toLowerCase().includes(search.toLowerCase());
         });
         return isMatched;
     }
@@ -125,8 +180,16 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
         <Table>
             <TableHead className="head">
                 <TableRow>
-                    {Object.entries(props.headers).map(([key, header]) => {
-                        return <TableCell>{header}</TableCell>
+                    {Object.entries(headers).map(([key, header]) => {
+                        return <TableCell>
+                            <TableSortLabel
+                                active={sortBy === key}
+                                direction={sortOrder}
+                                onClick={requestSort(key as ISortBy<T>)}
+                            >
+                                {header}
+                            </TableSortLabel>
+                        </TableCell>
                     })}
                 </TableRow>
             </TableHead>
@@ -137,7 +200,7 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
                             ref={droppableProvided.innerRef}
                             {...droppableProvided.droppableProps}>
                             {
-                                props.items.filter((item) => {
+                                items.filter((item) => {
                                     return isMatchedWithSearchFilter(item);
                                 }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(renderRow)
                             }
@@ -150,7 +213,7 @@ export default function ItemsTable<T extends IMinTableItem>(props: ItemsTablePro
                 id="pagination"
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={props.items.length}
+                count={items.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
