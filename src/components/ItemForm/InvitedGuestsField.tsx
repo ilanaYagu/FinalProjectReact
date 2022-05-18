@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { TextField, Chip } from "@mui/material";
 
-interface InvitedGuestsFiledProps {
+interface InvitedGuestsFieldProps {
     invitedGuests?: string[];
     setInvitedGuests(newInvitedGuests: string[]): void;
 }
 
-const InvitedGuestsFiled = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFiledProps) => {
+const InvitedGuestsField = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFieldProps) => {
     const [newGuest, setnewGuest] = useState<string>("");
 
     const handleKeyDown = (evt: React.KeyboardEvent<HTMLDivElement>) => {
@@ -27,7 +27,6 @@ const InvitedGuestsFiled = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFi
         <div>
             {invitedGuests?.map((name: string) => (
                 <Chip
-                    key={name}
                     label={name} variant="outlined"
                     onDelete={() =>
                         setInvitedGuests(invitedGuests.filter((chip) => chip !== name))
@@ -35,7 +34,6 @@ const InvitedGuestsFiled = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFi
                 />
             ))}
             <TextField
-                id="input-chips-email"
                 placeholder="new guest"
                 variant="standard"
                 value={newGuest}
@@ -47,4 +45,4 @@ const InvitedGuestsFiled = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFi
     );
 }
 
-export default InvitedGuestsFiled;
+export default InvitedGuestsField;

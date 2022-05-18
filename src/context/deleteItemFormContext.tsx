@@ -1,23 +1,26 @@
-import React, { useState } from 'react';
-import { IEvent } from '../types/eventsTypes';
+import React, { useState, createContext, PropsWithChildren } from 'react';
+import { Basic } from '../classes/Basic';
 import { DeleteItemFormContextType } from '../types/generalTypes';
-import { ITask } from '../types/tasksTypes';
 
+export const DeleteItemFormContext = createContext<DeleteItemFormContextType>({
+    itemToDelete: "",
+    isDeleteDialogOpen: false,
+    handleCloseDeleteDialog: () => { },
+    handleOpenDeleteDialog: () => { }
+});
 
-export const DeleteItemFormContext = React.createContext<DeleteItemFormContextType | null>(null);
-
-const DeleteItemFormProvider: React.FC<React.ReactNode> = ({ children }) => {
+const DeleteItemFormProvider = ({ children }: PropsWithChildren<{}>) => {
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState<"" | ITask | IEvent>("");
+    const [itemToDelete, setItemToDelete] = useState<Basic | "">("");
 
-    const handleOpenDeleteDialog = (item: ITask | IEvent) => {
+    const handleOpenDeleteDialog = (item: Basic): void => {
         setIsDeleteDialogOpen(true);
         setItemToDelete(item);
     };
 
 
-    const handleCloseDeleteDialog = () => {
+    const handleCloseDeleteDialog = (): void => {
         setIsDeleteDialogOpen(false);
         setItemToDelete("");
     };

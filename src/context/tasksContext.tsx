@@ -1,77 +1,47 @@
-import * as React from 'react';
-import { TasksContextType, ITask } from '../types/tasksTypes';
+import React, { useState, createContext, PropsWithChildren } from 'react';
+import { Task } from '../classes/Task';
+import { TasksContextType } from '../types/tasksTypes';
 
-export const TasksContext = React.createContext<TasksContextType | null>(null);
+export const TasksContext = createContext<TasksContextType>({
+    tasks: [],
+    addTask: () => { },
+    deleteTask: () => { },
+    updateTask: () => { },
+    getTask: () => undefined
+});
 
-const TasksProvider: React.FC<React.ReactNode> = ({ children }) => {
-    let [tasks, setTasks] = React.useState<ITask[]>([
-        {
-            id: "1",
-            title: 'Do my final project',
-            description: 'I need to fix some things.',
-            status: "In Progress",
-            priority: "Top",
-            estimatedTime: "3d",
-            untilDate: "2022-05-12 21:00"
-        },
-        {
-            id: "2",
-            title: 'Help my mom in the market',
-            description: 'grab things, take all we need.',
-            status: "Open",
-            priority: "Low",
-            estimatedTime: "1w"
-        },
-        {
-            id: "3983",
-            title: 'Ask the teacher about the final project',
-            description: 'The questions is on my notebook in my computer.',
-            status: "Done",
-            priority: "Top",
-            estimatedTime: "3.5d",
-            untilDate: "2022-05-12 19:00",
-            timeSpent: "10d",
-            review: "The teacher asked to send him the questions to his mail - and he answered the questions already!"
-        },
-        {
-            id: "3432",
-            title: 'Feed my cat',
-            description: 'First I need to buy the food.',
-            status: "Open",
-            priority: "Regular",
-            estimatedTime: "2d",
-            untilDate: "2022-05-30 08:00"
-        }
+const TasksProvider = ({ children }: PropsWithChildren<{}>) => {
+    let [tasks, setTasks] = useState<Task[]>([
+        new Task("1", 'Do my final project', 'I need to fix some things.', "3d", "In Progress", "Top", "", "", "2022-05-18 21:00"),
+        new Task("2", 'Help my mom in the market', 'grab things, take all we need.', "1w", "Open", "Low", "", "", ""),
+        new Task("3983", 'Ask the teacher about the final project', 'The questions is on my notebook in my computer.', "3.5d", "Done", "Top", "The teacher asked to send him the questions to his mail - and he answered the questions already!", "10d", "2022-05-12 19:00"),
+        new Task("3432", 'Feed my cat', 'First I need to buy the food.', "2d", "Open", "Regular", "", "", "2022-05-30 08:00")
     ]);
-    const addTask = (newTask: ITask) => {
-        setTasks([...tasks, newTask]);
+    const addTask = (newTask: Task): void => {
+        const task = new Task(newTask.id, newTask.title, newTask.description,
+            newTask.estimatedTime, newTask.status, newTask.priority, newTask.review, newTask.timeSpent, newTask.untilDate);
+        setTasks([...tasks, task]);
     };
-    const updateTask = (taskToUpdate: ITask) => {
-        let i: number;
-        const temp = [...tasks];
-        for (i = 0; i < temp.length; i++) {
-            if (temp[i].id === taskToUpdate.id) {
-                temp[i] = taskToUpdate;
+    const updateTask = (taskToUpdate: Task): void => {
+        const tempTasks = tasks.map((task) => {
+            if (task.id === taskToUpdate.id) {
+                return new Task(taskToUpdate.id, taskToUpdate.title, taskToUpdate.description,
+                    taskToUpdate.estimatedTime, taskToUpdate.status, taskToUpdate.priority, taskToUpdate.review, taskToUpdate.timeSpent, taskToUpdate.untilDate);
             }
-        }
-        setTasks(temp);
+            return task;
+        });
+        setTasks(tempTasks);
     };
 
-    const deleteTask = (id: string) => {
-
-        const newTasksArr: ITask[] = tasks.filter((task, index) => {
+    const deleteTask = (id: string): void => {
+        const newTasksArr: Task[] = tasks.filter((task) => {
             return task.id !== id
         });
         setTasks(newTasksArr);
     }
 
-    const getTask = (id: string): ITask | null => {
-        for (const task of tasks) {
-            if (task.id === id) {
-                return task;
-            }
-        }
-        return null;
+    const getTask = (id: string): Task | undefined => {
+        return tasks.find((task) => id === task.id);
     }
 
 

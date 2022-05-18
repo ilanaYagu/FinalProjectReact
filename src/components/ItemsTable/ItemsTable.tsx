@@ -12,29 +12,32 @@ import {
 import { DragDropContext, Draggable, DraggableProvided, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CustomRenderers, IMinTableItem, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
+import { CustomRenderers, MinTableItem, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
 import './ItemsTable.css';
+import { Basic } from "../../classes/Basic";
 
-interface ItemsTableProps<T extends IMinTableItem> {
-    items: T[];
-    setItems(newItems: T[]): void;
-    headers: TableHeaders<T>;
-    customRenderers?: CustomRenderers<T>;
-    otherColumn?: otherColumnProperties<T>;
-    deleteItem(item: T): void;
-    editItem(item?: T): void;
+interface ItemsTableProps {
+    items: Basic[];
+    setItems(newItems: Basic[]): void;
+    headers: TableHeaders<Basic>;
+    customRenderers?: CustomRenderers<Basic>;
+    otherColumn?: otherColumnProperties<Basic>;
+    deleteItem(item: Basic): void;
+    editItem(item?: Basic): void;
     search: string;
-    searchableProperties: (keyof T)[];
+    searchableProperties: (keyof Basic)[];
 }
 
-type ISortOrder = "asc" | "desc" | undefined;
-type ISortBy<T extends IMinTableItem> = keyof TableHeaders<T> | "";
+type SortOrder = "asc" | "desc" | undefined;
+type SortBy<T extends MinTableItem> = keyof TableHeaders<T> | "";
 
-export default function ItemsTable<T extends IMinTableItem>({ items, setItems, headers, customRenderers, otherColumn, deleteItem, editItem, search, searchableProperties }: ItemsTableProps<T>) {
+const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, deleteItem, editItem, search, searchableProperties }: ItemsTableProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortBy, setSortBy] = useState<ISortBy<T>>("")
-    const [sortOrder, setSortOrder] = useState<ISortOrder>(undefined)
+    const [sortBy, setSortBy] = useState<SortBy<Basic>>("")
+    const [sortOrder, setSortOrder] = useState<SortOrder>(undefined)
+
+
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
         setPage(newPage);
@@ -45,8 +48,8 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
         setPage(0);
     };
 
-    const sortData = (newSortBy: ISortBy<T>, newSortOrder: ISortOrder) => {
-        return items.sort((i: T, j: T) => {
+    const sortData = (newSortBy: SortBy<Basic>, newSortOrder: SortOrder) => {
+        return items.sort((i: Basic, j: Basic) => {
             if (!(newSortOrder === undefined || ["other", "actions", "type"].includes(newSortBy) || newSortBy === "")) {
                 if (!i[newSortBy] || !j[newSortBy]) {
                     if (i[newSortBy]) {
@@ -71,9 +74,9 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
         });
     }
 
-    const requestSort = (pSortBy: ISortBy<T>) => {
-        let newSortOrder: ISortOrder = sortOrder;
-        let newSortBy: ISortBy<T> = sortBy;
+    const requestSort = (pSortBy: SortBy<Basic>) => {
+        let newSortOrder: SortOrder = sortOrder;
+        let newSortBy: SortBy<Basic> = sortBy;
         return () => {
             if (pSortBy === sortBy) {
                 if (sortOrder === "desc") {
@@ -93,7 +96,7 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
         };
     }
 
-    const renderRow = (item: T, index: number) => {
+    const renderRow = (item: Basic, index: number) => {
         return (
             <Draggable
                 key={item.id + " " + index}
@@ -116,7 +119,7 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
                                         return <TableCell>
                                             {
                                                 customRenderer ?
-                                                    customRenderer(item) : headerKey in item ? item[headerKey as keyof T]
+                                                    customRenderer(item) : headerKey in item ? item[headerKey as keyof Basic]
                                                         : ""
                                             }
                                         </TableCell>
@@ -129,9 +132,9 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
                                 <TableCell>
                                     {
                                         Object.entries(otherColumn).map(([key, value]) => {
-                                            return item[key as keyof T] ?
+                                            return item[key as keyof Basic] ?
                                                 <div className="otherInfo">
-                                                    <em>{value}</em><br /> {item[key as keyof T]}
+                                                    <em>{value}</em><br /> {item[key as keyof Basic]}
                                                 </div>
                                                 :
                                                 " "
@@ -160,16 +163,17 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
         if (result.destination.index === result.source.index) {
             return;
         }
-        const temp = items;
+
+        const temp = [...items];
         const d = temp[result.destination!.index];
         temp[result.destination!.index] = temp[result.source.index];
         temp[result.source.index] = d;
-        items = temp;
+        setItems(temp);
     };
 
-    const isMatchedWithSearchFilter = (itm: T) => {
+    const isMatchedWithSearchFilter = (itm: Basic) => {
         let isMatched = false;
-        searchableProperties.forEach((k: keyof T) => {
+        searchableProperties.forEach((k: keyof Basic) => {
             const valueToCheck: string = itm[k] as unknown as string;
             isMatched = isMatched || valueToCheck.toLowerCase().includes(search.toLowerCase());
         });
@@ -185,7 +189,7 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
                             <TableSortLabel
                                 active={sortBy === key}
                                 direction={sortOrder}
-                                onClick={requestSort(key as ISortBy<T>)}
+                                onClick={requestSort(key as SortBy<Basic>)}
                             >
                                 {header}
                             </TableSortLabel>
@@ -194,7 +198,7 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
                 </TableRow>
             </TableHead>
             <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="tasksAndEventsForToday" direction="vertical">
+                <Droppable droppableId="tasksAndEventsForToday" direction="vertical" >
                     {(droppableProvided: DroppableProvided) => (
                         <TableBody
                             ref={droppableProvided.innerRef}
@@ -222,3 +226,5 @@ export default function ItemsTable<T extends IMinTableItem>({ items, setItems, h
         </Table>
     );
 }
+
+export default ItemsTable;

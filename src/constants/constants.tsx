@@ -1,4 +1,4 @@
-import { IPriority, IStatus, ITask } from "../types/tasksTypes";
+import { Priority, Status } from "../types/tasksTypes";
 import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowDownRounded';
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
 import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
@@ -8,11 +8,14 @@ import Brightness1RoundedIcon from '@mui/icons-material/Brightness1Rounded';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import { green, pink } from "@mui/material/colors";
-import { IBeginningTimeEventFilterOption, IEvent } from "../types/eventsTypes";
+import { BeginningTimeEventFilterOption } from "../types/eventsTypes";
 import { otherColumnProperties, TableHeaders } from "../types/generalTypes";
+import { Task } from "../classes/Task";
+import { Event } from "../classes/Event";
+import { Basic } from "../classes/Basic";
 
 
-export const columnsForTasksTable: TableHeaders<ITask> = {
+export const columnsForTasksTable: TableHeaders<Task> = {
     type: "Type",
     priority: "Priority",
     title: "Title",
@@ -22,12 +25,12 @@ export const columnsForTasksTable: TableHeaders<ITask> = {
     actions: "Actions"
 };
 
-export const otherColumnForTasksTable: otherColumnProperties<ITask> = {
+export const otherColumnForTasksTable: otherColumnProperties<Task> = {
     untilDate: "Until Date",
     timeSpent: "Time Spent"
 };
 
-export const columnsForTodayTasksAndEventsTable: TableHeaders<ITask> | TableHeaders<IEvent> = {
+export const columnsForTodayTasksAndEventsTable: TableHeaders<Task> | TableHeaders<Event> = {
     type: "Type",
     priority: "Priority",
     title: "Title",
@@ -35,7 +38,7 @@ export const columnsForTodayTasksAndEventsTable: TableHeaders<ITask> | TableHead
     actions: "Actions"
 };
 
-export const otherColumnForTodayTasksAndEventsTable: otherColumnProperties<ITask> | otherColumnProperties<IEvent> = {
+export const otherColumnForTodayTasksAndEventsTable: otherColumnProperties<Task> | otherColumnProperties<Event> = {
     status: "Status",
     untilDate: "Until Date",
     beginningTime: "From",
@@ -44,7 +47,7 @@ export const otherColumnForTodayTasksAndEventsTable: otherColumnProperties<ITask
     location: "Location"
 };
 
-export const columnsForEventsTable: TableHeaders<IEvent> = {
+export const columnsForEventsTable: TableHeaders<Event> = {
     color: "Color",
     title: "Title",
     beginningTime: "From",
@@ -53,12 +56,12 @@ export const columnsForEventsTable: TableHeaders<IEvent> = {
     actions: "Actions"
 };
 
-export const statusesOptions: IStatus[] = ['Open', 'In Progress', 'Done'];
-export const priorityOptions: IPriority[] = ['Low', 'Top', 'Regular'];
+export const statusesOptions: Status[] = ['Open', 'In Progress', 'Done'];
+export const priorityOptions: Priority[] = ['Low', 'Top', 'Regular'];
 
 export const customRenderers = {
-    type: (it: ITask | IEvent) => (
-        "priority" in it ?
+    type: (it: Basic) => (
+        it instanceof Task ?
             it.priority === "Low" ?
                 <AssignmentIcon />
                 : it.priority === "Top" ?
@@ -67,8 +70,8 @@ export const customRenderers = {
             :
             <NotificationsActiveIcon />
     ),
-    priority: (it: ITask | IEvent) => (
-        "priority" in it ?
+    priority: (it: Basic) => (
+        it instanceof Task ?
             it.priority === "Low" ?
                 <KeyboardDoubleArrowDownRoundedIcon sx={{ color: green[500] }} />
                 : it.priority === "Top" ?
@@ -80,36 +83,15 @@ export const customRenderers = {
 }
 
 export const customRenderersEvents = {
-    color: (it: IEvent | ITask) => (
-        "color" in it &&
+    color: (it: Basic) => (
+        it instanceof Event &&
         <Brightness1RoundedIcon sx={{ color: "#" + it.color.hex }} />
     )
 }
 
-export const filterTodaysTasks = (tasks: ITask[]): ITask[] => {
-    return tasks.filter((task) => {
-        if (task.untilDate) {
-            const today = new Date();
-            const untilDate = new Date(task.untilDate);
-            return untilDate.getDate() === today.getDate() &&
-                untilDate.getMonth() === today.getMonth() &&
-                untilDate.getFullYear() === today.getFullYear()
-        }
-        return false;
-    });
+export enum Type {
+    Task = 'Task',
+    Event = 'Event',
 }
 
-export const filterTodaysEvents = (events: IEvent[]): IEvent[] => {
-    return events.filter((event) => {
-        if (event.beginningTime) {
-            const today = new Date();
-            const beginningTime = new Date(event.beginningTime);
-            return beginningTime.getDate() === today.getDate() &&
-                beginningTime.getMonth() === today.getMonth() &&
-                beginningTime.getFullYear() === today.getFullYear()
-        }
-        return false;
-    });
-}
-
-export const BeginningTimeEventOptions: IBeginningTimeEventFilterOption[] = ['Events For Today', 'Future Events']
+export const BeginningTimeEventOptions: BeginningTimeEventFilterOption[] = ['Events For Today', 'Future Events']

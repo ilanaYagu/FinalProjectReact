@@ -1,28 +1,32 @@
-import React, { useContext, useState } from 'react';
-import { IEvent } from '../types/eventsTypes';
+import React, { useState, createContext, PropsWithChildren } from 'react';
+import { Basic } from '../classes/Basic';
 import { ItemFormContextType } from '../types/generalTypes';
-import { ITask } from '../types/tasksTypes';
 
 
-export const ItemFormContext = React.createContext<ItemFormContextType | null>(null);
+export const ItemFormContext = createContext<ItemFormContextType>({
+    itemToUpdate: "",
+    isFormDialogOpen: false,
+    handleCloseDialog: () => { },
+    handleOpenUpdateForm: () => { },
+    handleOpenCreateForm: () => { }
+});
 
-const ItemFormProvider: React.FC<React.ReactNode> = ({ children }) => {
+const ItemFormProvider = ({ children }: PropsWithChildren<{}>) => {
 
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-    const [itemToUpdate, setItemToUpdate] = useState<ITask | IEvent | "">("");
+    const [itemToUpdate, setItemToUpdate] = useState<Basic | "">("");
 
-    const handleCloseDialog = () => {
+    const handleCloseDialog = (): void => {
         setIsFormDialogOpen(false);
         setItemToUpdate("");
-        console.log("closee" + isFormDialogOpen)
     };
 
-    const handleOpenUpdateForm = (item: ITask | IEvent) => {
+    const handleOpenUpdateForm = (item: Basic): void => {
         setIsFormDialogOpen(true);
         setItemToUpdate(item);
     };
 
-    const handleOpenCreateForm = () => {
+    const handleOpenCreateForm = (): void => {
         setIsFormDialogOpen(true);
     }
 

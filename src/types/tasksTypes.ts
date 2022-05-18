@@ -1,24 +1,18 @@
-import { IBasicType } from "./generalTypes";
+import { Task } from "../classes/Task";
 
-export interface ITask extends IBasicType {
-    estimatedTime: string;
-    status: IStatus;
-    priority: IPriority;
-    review?: string;
-    timeSpent?: string;
-    untilDate?: string;
-}
-export type IPriority = "Low" | "Regular" | "Top";
-export type IStatus = 'Open' | 'In Progress' | 'Done';
+
+export type Priority = "Low" | "Regular" | "Top";
+export type Status = 'Open' | 'In Progress' | 'Done';
 export type TasksContextType = {
-    tasks: ITask[];
-    addTask: (newTask: ITask) => void;
+    tasks: Task[];
+    addTask: (newTask: Task) => void;
     deleteTask: (id: string) => void;
-    updateTask: (taskToUpdate: ITask) => void;
-    getTask: (id: string) => ITask | null;
+    updateTask: (taskToUpdate: Task) => void;
+    getTask: (id: string) => Task | undefined;
 };
-export interface ITasksFilter {
-    selectedFilterStatus: IStatus | "",
-    selectedFilterPriority: IPriority | "",
+
+export interface TasksFilter {
+    selectedFilterStatus: Status | "",
+    selectedFilterPriority: Priority | "",
 }
 

@@ -1,77 +1,66 @@
+import React, { useState, createContext, PropsWithChildren } from 'react';
 import { createColor } from 'mui-color';
-import * as React from 'react';
-import { EventsContextType, IEvent } from '../types/eventsTypes';
+import { Event } from '../classes/Event';
+import { EventsContextType } from '../types/eventsTypes';
 
-export const EventsContext = React.createContext<EventsContextType | null>(null);
+export const EventsContext = createContext<EventsContextType>({
+    events: [],
+    addEvent: () => { },
+    deleteEvent: () => { },
+    updateEvent: () => { },
+    getEvent: () => undefined
+});
 
-const EventsProvider: React.FC<React.ReactNode> = ({ children }) => {
-    let [events, setEvents] = React.useState<IEvent[]>([
-        {
-            id: "1",
-            title: 'Vet - for my dogo',
-            description: 'The doctor ask me to call him one day before the appointment.',
-            beginningTime: '2022-05-12 12:23',
-            endingTime: '2022-07-09 13:23',
-            color: createColor("#C88383"),
-            location: "Ashkelon, the clinic of Yosof",
-            invitedGuests: ["Michal Grinborg", "Ron C.", "Ilanit"]
-        },
-        {
-            id: "2",
-            title: 'Wedding to my bff!',
-            description: 'Need to buy a dress, and a gift of course.',
-            beginningTime: '2025-09-12 19:30',
-            endingTime: '2025-09-13 05:45',
-            color: createColor("#7EA87E"),
-            location: "Paris",
-            invitedGuests: ["Shai", "Ronit", "Hen Levis", "Sholamit"]
-        },
-        {
-            id: "232",
-            title: 'Meeting with the hamus organization',
-            description: 'with the highest there, like abu masen',
-            beginningTime: '2025-07-20 17:30',
-            endingTime: '2025-07-20 18:45',
-            color: createColor("#94B1A6"),
-            location: "Egypt",
-            invitedGuests: ["Ilanit Levi", "Galit Gutman", "Yunit"]
-        }
+const EventsProvider = ({ children }: PropsWithChildren<{}>) => {
+    let [events, setEvents] = useState<Event[]>([
+        new Event("1", 'Vet - for my dogo', 'The doctor ask me to call him one day before the appointment.', '2022-05-12 12:23', '2022-07-09 13:23', createColor("#C88383"),
+            "Ashkelon, the clinic of Yosof",
+            "",
+            ["Michal Grinborg", "Ron C.", "Ilanit"]
+        ),
+        new Event("2", 'Wedding to my bff!', 'Need to buy a dress, and a gift of course.', '2025-09-12 19:30', '2025-09-13 05:45', createColor("#7EA87E"),
+            "Paris",
+            "",
+            ["Shai", "Ronit", "Hen Levis", "Sholamit"]
+        ),
+        new Event("232", 'Meeting with the hamus organization', 'with the highest there, like abu masen', '2025-07-20 17:30', '2025-07-20 18:45', createColor("#94B1A6"),
+            "Egypt",
+            "",
+            ["Ilanit Levi", "Galit Gutman", "Yunit"]
+        )
     ]);
-    const addEvent = (newEvent: IEvent) => {
-        setEvents([...events, newEvent]);
-    };
-    const updateEvent = (event: IEvent) => {
-        let i: number;
-        const temp = [...events];
 
-        for (i = 0; i < temp.length; i++) {
-            if (temp[i].id === event.id) {
-                temp[i] = event;
-                console.log(temp[i])
+    const addEvent = (newEvent: Event): void => {
+        const event = new Event(newEvent.id, newEvent.title, newEvent.description,
+            newEvent.beginningTime, newEvent.endingTime, newEvent.color, newEvent.location, newEvent.notificationTime, newEvent.invitedGuests);
+        setEvents([...events, event]);
+    };
+
+    const updateEvent = (eventToUpdate: Event): void => {
+        const tempEvents = events.map((event) => {
+            if (event.id === eventToUpdate.id) {
+                return new Event(eventToUpdate.id, eventToUpdate.title, eventToUpdate.description,
+                    eventToUpdate.beginningTime, eventToUpdate.endingTime, eventToUpdate.color, eventToUpdate.location, eventToUpdate.notificationTime, eventToUpdate.invitedGuests);
             }
-        }
-        setEvents(temp);
+            return event;
+        });
+        setEvents(tempEvents);
     };
 
-    const deleteEvent = (id: string) => {
-
-        const newEventsArr: IEvent[] = events.filter((event, index) => {
+    const deleteEvent = (id: string): void => {
+        const newEventsArr: Event[] = events.filter((event) => {
             return event.id !== id
         });
         setEvents(newEventsArr);
     }
 
-    const getEvent = (id: string): IEvent | null => {
-        for (const event of events) {
-            if (event.id === id) {
-                return event;
-            }
-        }
-        return null;
+    const getEvent = (id: string): Event | undefined => {
+        return events.find((event) => id === event.id);
     }
 
 
     return <EventsContext.Provider value={{ events, addEvent, updateEvent, deleteEvent, getEvent }}>{children}</EventsContext.Provider>;
 };
+
 
 export default EventsProvider;
