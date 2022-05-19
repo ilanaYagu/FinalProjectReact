@@ -8,7 +8,6 @@ import Brightness1RoundedIcon from '@mui/icons-material/Brightness1Rounded';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import { green, pink } from "@mui/material/colors";
-import { BeginningTimeEventFilterOption } from "../types/eventsTypes";
 import { otherColumnProperties, TableHeaders } from "../types/generalTypes";
 import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
@@ -56,8 +55,8 @@ export const columnsForEventsTable: TableHeaders<Event> = {
     actions: "Actions"
 };
 
-export const statusesOptions: Status[] = ['Open', 'In Progress', 'Done'];
-export const priorityOptions: Priority[] = ['Low', 'Top', 'Regular'];
+export const statusesOptions: Status[] = Object.values(Status);
+export const priorityOptions: Priority[] = Object.values(Priority);
 
 export const customRenderers = {
     type: (it: Basic) => (
@@ -94,4 +93,3 @@ export enum Type {
     Event = 'Event',
 }
 
-export const BeginningTimeEventOptions: BeginningTimeEventFilterOption[] = ['Events For Today', 'Future Events']

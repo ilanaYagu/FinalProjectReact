@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -14,13 +14,12 @@ import { EventsContext } from '../../context/eventsContext';
 import { Basic } from '../../classes/Basic';
 import { Task } from '../../classes/Task';
 
-
 interface DeleteItemFormProps {
     item: Basic;
 }
 
 function DeleteItemForm({ item }: DeleteItemFormProps) {
-    const { handleCloseDeleteDialog } = useContext(DeleteItemFormContext) as DeleteItemFormContextType;
+    const { handleCloseDeleteDialog, isDeleteDialogOpen } = useContext(DeleteItemFormContext) as DeleteItemFormContextType;
     const { deleteTask } = useContext(TasksContext) as TasksContextType;
     const { deleteEvent } = useContext(EventsContext) as EventsContextType;
 
@@ -31,7 +30,7 @@ function DeleteItemForm({ item }: DeleteItemFormProps) {
     }
 
     return (
-        <Dialog open={true} >
+        <Dialog open={isDeleteDialogOpen} >
             <DialogTitle>Delete</DialogTitle>
             <DialogContent>
                 <DialogContentText>

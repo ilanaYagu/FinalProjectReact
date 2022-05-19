@@ -1,36 +1,38 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import { EventsContext } from '../../context/eventsContext';
-import { BeginningTimeEventFilterOption, EventsContextType, BeginningTimeEventFilter } from '../../types/eventsTypes';
-import { BeginningTimeEventOptions } from '../../constants/constants';
 import { Event } from '../../classes/Event';
 import { isFutureDate, isToday } from '../../utils/utils';
 
-interface EventsFiltersTableProps {
-    setEvents(events: Event[]): void;
+
+enum BeginningTimeEventFilter {
+    TodayEvents = "Today Events",
+    FutureEvents = "Future Events",
+    AllEvents = "All Events"
 }
 
-const EventsFiltersTable = ({ setEvents }: EventsFiltersTableProps) => {
-    const { events } = useContext(EventsContext) as EventsContextType;
-    const [filters, setFilters] = useState<BeginningTimeEventFilter>({
-        selectedBeginningTimeEvent: ""
-    });
+interface EventsFiltersTableProps {
+    setEvents(events: Event[]): void;
+    allData: Event[];
+}
+
+const EventsFiltersTable = ({ setEvents, allData }: EventsFiltersTableProps) => {
+    const [filter, setFilter] = useState<BeginningTimeEventFilter>(BeginningTimeEventFilter.AllEvents);
 
     useEffect(() => {
         setEvents(filteredEvents());
-    }, [filters, events])
+    }, [filter, allData])
 
     const filteredEvents = (): Event[] => {
-        return events.filter((event: Event) => {
+        return allData.filter((event: Event) => {
             const eventDate = new Date(event.beginningTime);
-            if (filters.selectedBeginningTimeEvent as string === '') {
+            if (filter === BeginningTimeEventFilter.AllEvents) {
                 return true;
             }
-            else if (filters.selectedBeginningTimeEvent as string === 'Events For Today') {
+            else if (filter === BeginningTimeEventFilter.TodayEvents) {
                 return isToday(eventDate);
             }
             else {
-                isFutureDate(eventDate)
+                return isFutureDate(eventDate)
             }
         })
     }
@@ -38,14 +40,12 @@ const EventsFiltersTable = ({ setEvents }: EventsFiltersTableProps) => {
     return (
         <Select
             style={{ width: "auto", height: "40px", marginLeft: "9px", marginRight: "9px" }}
-            value={filters.selectedBeginningTimeEvent}
-            onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, selectedBeginningTimeEvent: event.target.value as BeginningTimeEventFilterOption })}
-            name="priority"
-            displayEmpty
+            value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilter)}
         >
-            <MenuItem value="">All Events</MenuItem>
             {
-                BeginningTimeEventOptions.map((option: BeginningTimeEventFilterOption) => <MenuItem value={option}>{option}</MenuItem>)
+                Object.values(BeginningTimeEventFilter).map((value) => {
+                    return <MenuItem value={value}>{value}</MenuItem>
+                })
             }
         </Select>
     );

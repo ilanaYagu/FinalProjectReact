@@ -7,21 +7,22 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import validator from "validator";
-import { Autocomplete, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { makeStyles, createStyles } from "@mui/styles";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { Priority, Status, TasksContextType } from '../../types/tasksTypes';
-import { priorityOptions, statusesOptions, Type } from '../../constants/constants';
+import { Type } from '../../constants/constants';
 import { TasksContext } from '../../context/tasksContext';
 import { EventsContextType } from '../../types/eventsTypes';
-import { Color, ColorPicker, createColor } from 'material-ui-color';
+import { createColor } from 'material-ui-color';
 import { EventsContext } from '../../context/eventsContext';
 import { ItemFormContextType, ItemFormType } from '../../types/generalTypes';
-import InvitedGuestsField from './InvitedGuestsField';
 import { ItemFormContext } from '../../context/itemFormContext';
 import { Basic } from '../../classes/Basic';
 import { Task } from '../../classes/Task';
 import { Event } from '../../classes/Event';
+import TaskForm from './TaskForm';
+import EventForm from './EventForm';
 
 const itemFormTypeOptions: ItemFormType[] = ["Task", "Event"];
 
@@ -55,30 +56,18 @@ const useStyles = makeStyles(() => createStyles({
 
 const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
     const classes = useStyles();
-    const { addTask, updateTask, getTask } = useContext(TasksContext) as TasksContextType;
-    const { addEvent, updateEvent, getEvent } = useContext(EventsContext) as EventsContextType;
-    const { handleCloseDialog, itemToUpdate } = useContext(ItemFormContext) as ItemFormContextType;
+    const { addTask, updateTask } = useContext(TasksContext) as TasksContextType;
+    const { addEvent, updateEvent } = useContext(EventsContext) as EventsContextType;
+    const { handleCloseDialog, itemToUpdate, isFormDialogOpen } = useContext(ItemFormContext) as ItemFormContextType;
 
-    let [baseInputs, setBaseInputs] = useState<Basic>({
-        title: "",
-        id: "",
-        description: "",
-    })
+    let [baseInputs, setBaseInputs] = useState<Basic>({ title: "", id: "", description: "" })
     let [taskInputs, setTaskInputs] = useState<Omit<Task, "id" | "title" | "description">>({
-        status: "Open",
-        estimatedTime: "",
-        priority: "Low",
-        review: " ",
-        timeSpent: "",
-        untilDate: "",
+        status: Status.Open, estimatedTime: "", priority: Priority.Low,
+        review: " ", timeSpent: "", untilDate: ""
     });
     let [eventInputs, setEventInputs] = useState<Omit<Event, "id" | "title" | "description">>({
-        beginningTime: "",
-        endingTime: "",
-        color: createColor("red"),
-        location: "",
-        notificationTime: "",
-        invitedGuests: []
+        beginningTime: "", endingTime: "", color: createColor("red"), location: "",
+        notificationTime: "", invitedGuests: []
     })
     let [buttonText, setButtonText] = useState<string>("");
     let [formType, setFormType] = useState<ItemFormType>(type);
@@ -88,15 +77,11 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
             setButtonText("Create");
         } else {
             setButtonText("Update");
-            let item: Task | Event | undefined = formType === "Task" ? getTask(itemToUpdate.id) : getEvent(itemToUpdate.id);
-            console.log(item)
-            if (item) {
-                setBaseInputs({ ...baseInputs, id: item.id, title: item.title, description: item.description });
-                (item instanceof Task) ?
-                    setTaskInputs({ ...taskInputs, status: item.status, estimatedTime: item.estimatedTime, priority: item.priority, timeSpent: item.timeSpent, untilDate: item.untilDate, review: item.review })
-                    :
-                    setEventInputs({ ...eventInputs, color: item.color, beginningTime: item.beginningTime, endingTime: item.endingTime, location: item.location, notificationTime: item.notificationTime, invitedGuests: item.invitedGuests })
-            }
+            setBaseInputs({ ...baseInputs, id: itemToUpdate.id, title: itemToUpdate.title, description: itemToUpdate.description });
+            if (itemToUpdate instanceof Task)
+                setTaskInputs({ ...taskInputs, status: itemToUpdate.status, estimatedTime: itemToUpdate.estimatedTime, priority: itemToUpdate.priority, timeSpent: itemToUpdate.timeSpent, untilDate: itemToUpdate.untilDate, review: itemToUpdate.review })
+            else if (itemToUpdate instanceof Event)
+                setEventInputs({ ...eventInputs, color: itemToUpdate.color, beginningTime: itemToUpdate.beginningTime, endingTime: itemToUpdate.endingTime, location: itemToUpdate.location, notificationTime: itemToUpdate.notificationTime, invitedGuests: itemToUpdate.invitedGuests })
         }
     }, []);
 
@@ -120,11 +105,8 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
 
     const isValidFileds = (): boolean => {
         let isValid = false;
-        if (
-            validator.trim(baseInputs.id) === "" ||
-            validator.trim(baseInputs.title) === "" ||
-            validator.trim(baseInputs.description) === "" ||
-            (formType === "Event" && validator.trim(eventInputs.beginningTime) === "") ||
+        if (validator.trim(baseInputs.id) === "" || validator.trim(baseInputs.title) === "" ||
+            validator.trim(baseInputs.description) === "" || (formType === "Event" && validator.trim(eventInputs.beginningTime) === "") ||
             (formType === "Event" && validator.trim(eventInputs.endingTime) === "")
         ) {
             alert("Please fill the Required Fields");
@@ -135,72 +117,6 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
             isValid = true;
         }
         return isValid;
-    }
-
-    const renderTaskDetails = (): JSX.Element => {
-        return <>
-            <Autocomplete freeSolo disableClearable className={classes.formField} defaultValue={taskInputs.status} options={statusesOptions.map((option: Status) => option)}
-                onChange={(event: React.FormEvent) => {
-                    let newStatus: Status = (event.target as HTMLInputElement).textContent as Status;
-                    newStatus = !statusesOptions.includes(newStatus) ? "Open" : newStatus;
-                    setTaskInputs({ ...taskInputs, status: newStatus, review: newStatus !== "Done" ? "" : taskInputs.review })
-                }}
-                renderInput={(params) => (
-                    <TextField {...params} label="Status" InputProps={{ ...params.InputProps, type: 'search' }} />
-                )}
-            />
-            <TextField className={classes.formField} label="Estimated Time" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTaskInputs({ ...taskInputs, estimatedTime: event.target.value })} defaultValue={taskInputs.estimatedTime} />
-            <Autocomplete freeSolo disableClearable className={classes.formField} defaultValue={taskInputs.priority} options={priorityOptions.map((option: Priority) => option)}
-                onChange={(event: React.FormEvent) => {
-                    let newPriority: Priority = (event.target as HTMLInputElement).textContent as Priority;
-                    newPriority = !priorityOptions.includes(newPriority) ? "Low" : newPriority;
-                    setTaskInputs({ ...taskInputs, priority: newPriority, untilDate: newPriority !== "Top" ? "" : taskInputs.untilDate })
-                }}
-                renderInput={(params) => (
-                    <TextField {...params} label="Priority" InputProps={{ ...params.InputProps, type: 'search' }} />
-                )}
-            />
-            {
-                taskInputs.priority === "Top" &&
-                <TextField className={classes.formField} label="Until Date" type="datetime-local" defaultValue={taskInputs.untilDate} sx={{ width: "85%" }}
-                    InputLabelProps={{ shrink: true }} value={taskInputs.untilDate?.replace(" ", "T")}
-                    onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-                        setTaskInputs({ ...taskInputs, untilDate: event.target.value.replace("T", " ") });
-                    }} />
-            }
-            {
-                taskInputs.status === "Done" &&
-                <>
-                    Review: <TextareaAutosize className={classes.formField} placeholder="Enter review..." defaultValue={taskInputs.review}
-                        onChange={(event: React.FormEvent) => setTaskInputs({ ...taskInputs, review: (event.target as HTMLInputElement).value })}
-                        style={{ width: 250, height: 100, marginTop: 10, overflow: 'auto', backgroundColor: 'inherit', color: "white" }} required />
-                    <TextField label="Time spent" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTaskInputs({ ...taskInputs, timeSpent: event.target.value })} defaultValue={taskInputs.timeSpent} />
-                </>
-            }
-        </>;
-    }
-
-    const renderEventDetails = (): JSX.Element => {
-        return <>
-            <ColorPicker value={eventInputs.color} onChange={(newColor: Color) => setEventInputs({ ...eventInputs, color: newColor })} />
-            <TextField className={classes.formField} label="Beginning Time" type="datetime-local" defaultValue={eventInputs.beginningTime}
-                InputLabelProps={{ shrink: true }} value={eventInputs.beginningTime.replace(" ", "T")}
-                onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-                    setEventInputs({ ...eventInputs, beginningTime: event.target.value.replace("T", " ") });
-                }} />
-            <TextField className={classes.formField} label="Ending Time" type="datetime-local" defaultValue={eventInputs.endingTime}
-                InputLabelProps={{ shrink: true }} value={eventInputs.endingTime.replace(" ", "T")}
-                onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-                    setEventInputs({ ...eventInputs, endingTime: event.target.value.replace("T", " ") });
-                }} />
-            <TextField className={classes.formField} label="Notification Time" type="datetime-local" defaultValue={eventInputs.notificationTime}
-                InputLabelProps={{ shrink: true }} value={eventInputs.notificationTime?.replace(" ", "T")}
-                onChange={(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-                    setEventInputs({ ...eventInputs, notificationTime: event.target.value.replace("T", " ") });
-                }} />
-            <TextField className={classes.formField} label="Location" variant="outlined" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEventInputs({ ...eventInputs, location: event.target.value })} defaultValue={eventInputs.location} />
-            <div>Invited Guests:</div> <InvitedGuestsField invitedGuests={eventInputs.invitedGuests} setInvitedGuests={(newInvitedGuests: string[]) => setEventInputs({ ...eventInputs, invitedGuests: newInvitedGuests })} />
-        </>
     }
 
     const renderBaseDetails = (): JSX.Element => {
@@ -220,41 +136,41 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
         </DialogActions>
     }
 
+    const renderSwitchType = () => {
+        return (enableSwitchType && !itemToUpdate) &&
+            <>
+                <span className={classes.chooseTypeTitle}>Choose Type:</span>
+                <Select
+                    value={formType} label="Type"
+                    onChange={(event: SelectChangeEvent<string>) => setFormType(event.target.value as ItemFormType)}>
+                    {
+                        itemFormTypeOptions.map((typeOption) =>
+                            <MenuItem value={typeOption}>{typeOption}</MenuItem>
+                        )
+                    }
+                </Select>
+            </>
+
+    }
 
     return (
         <Dialog
-            open={true} onClose={handleCloseDialog} style={{ alignItems: "center" }} classes={{ paper: classes.dialog }}>
+            open={isFormDialogOpen} onClose={handleCloseDialog} classes={{ paper: classes.dialog }}>
             <DialogTitle>{buttonText + " " + formType} </DialogTitle>
             <form onSubmit={formSubmit}>
                 <DialogContent>
                     <DialogContentText> Details: </DialogContentText>
-                    <div>
-                        {
-                            (enableSwitchType && !itemToUpdate) &&
-                            <>
-                                <span className={classes.chooseTypeTitle}>Choose Type:</span>
-                                <Select
-                                    value={formType} label="Type"
-                                    onChange={(event: SelectChangeEvent<string>) => setFormType(event.target.value as ItemFormType)}>
-                                    {
-                                        itemFormTypeOptions.map((typeOption) =>
-                                            <MenuItem value={typeOption}>{typeOption}</MenuItem>
-                                        )
-                                    }
-                                </Select>
-                            </>
-                        }
-                        {renderBaseDetails()}
-                        {
-                            formType === "Task" ?
-                                renderTaskDetails()
-                                : renderEventDetails()
-                        }
-                    </div>
+                    {renderSwitchType()}
+                    {renderBaseDetails()}
+                    {
+                        formType === "Task" ?
+                            <TaskForm taskInputs={taskInputs} setTaskInputs={setTaskInputs} classField={classes.formField} />
+                            :
+                            <EventForm eventInputs={eventInputs} setEventInputs={setEventInputs} classField={classes.formField} />
+                    }
                 </DialogContent>
                 {renderDialogActions()}
             </form>
-
         </Dialog >
     );
 };

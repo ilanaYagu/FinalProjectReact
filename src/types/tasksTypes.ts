@@ -1,8 +1,17 @@
 import { Task } from "../classes/Task";
 
 
-export type Priority = "Low" | "Regular" | "Top";
-export type Status = 'Open' | 'In Progress' | 'Done';
+export enum Priority {
+    Low = "Low",
+    Regular = "Regular",
+    Top = "Top"
+}
+
+export enum Status {
+    Open = "Open",
+    InProgress = "In Progress",
+    Done = "Done"
+}
 export type TasksContextType = {
     tasks: Task[];
     addTask: (newTask: Task) => void;
@@ -11,8 +20,4 @@ export type TasksContextType = {
     getTask: (id: string) => Task | undefined;
 };
 
-export interface TasksFilter {
-    selectedFilterStatus: Status | "",
-    selectedFilterPriority: Priority | "",
-}
 

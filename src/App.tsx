@@ -1,14 +1,18 @@
-import TasksProvider from './context/tasksContext';
+import { TasksContext } from './context/tasksContext';
+import { useContext } from "react";
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
 import { NavSideBar } from './components/NavSideBar/NavSideBar';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from '@mui/material';
 import { blueGrey, grey } from '@mui/material/colors';
-import EventsProvider from './context/eventsContext';
-import ItemFormProvider from './context/itemFormContext';
-import DeleteItemFormProvider from './context/deleteItemFormContext';
-import MainPage from "./pages/MainPage";
-import { Type } from "./constants/constants";
+import { EventsContext } from './context/eventsContext';
+import ManagementPage from "./pages/ManagementPage";
+import { columnsForEventsTable, columnsForTasksTable, columnsForTodayTasksAndEventsTable, otherColumnForTasksTable, otherColumnForTodayTasksAndEventsTable, Type } from "./constants/constants";
+import { TasksContextType } from './types/tasksTypes';
+import { EventsContextType } from './types/eventsTypes';
+import { filterTodayItems } from './utils/utils';
+import { Event } from './classes/Event';
+import { Task } from './classes/Task';
 
 const theme = createTheme({
   palette: {
@@ -33,27 +37,23 @@ const theme = createTheme({
 });
 
 const App = () => {
+  const { events } = useContext<EventsContextType>(EventsContext);
+  const { tasks } = useContext<TasksContextType>(TasksContext);
+  const todayTasks = filterTodayItems(tasks) as Task[];
+  const todayEvents = filterTodayItems(events) as Event[];
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <TasksProvider >
-        <EventsProvider>
-          <ItemFormProvider>
-            <DeleteItemFormProvider>
-              <Router>
-                <Routes>
-                  <Route path="/tasks" element={<MainPage type={Type.Task} />} />
-                  <Route path="/events" element={<MainPage type={Type.Event} />} />
-                  <Route path="/dashboard" element={<MainPage />} />
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-                <NavSideBar />
-              </Router>
-            </DeleteItemFormProvider>
-          </ItemFormProvider>
-        </EventsProvider>
-      </TasksProvider>
+      <Router>
+        <Routes>
+          <Route path="/tasks" element={<ManagementPage type={Type.Task} allDataTable={tasks} headersOfTable={columnsForTasksTable} otherColumnOfTable={otherColumnForTasksTable} />} />
+          <Route path="/events" element={<ManagementPage type={Type.Event} allDataTable={events} headersOfTable={columnsForEventsTable} />} />
+          <Route path="/dashboard" element={<ManagementPage allDataTable={[...todayEvents, ...todayTasks]} todayEvents={todayEvents} todayTasks={todayTasks} headersOfTable={columnsForTodayTasksAndEventsTable} otherColumnOfTable={otherColumnForTodayTasksAndEventsTable} />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+        <NavSideBar />
+      </Router>
     </ThemeProvider>
   )
 }

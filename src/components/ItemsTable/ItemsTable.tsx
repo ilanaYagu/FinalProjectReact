@@ -1,18 +1,9 @@
-import React, { MouseEventHandler, useState } from "react";
-import {
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TableSortLabel
-} from "@mui/material";
+import React, { useState } from "react";
+import { IconButton, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { DragDropContext, Draggable, DraggableProvided, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CustomRenderers, MinTableItem, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
+import { CustomRenderers, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
 import './ItemsTable.css';
 import { Basic } from "../../classes/Basic";
 
@@ -28,16 +19,19 @@ interface ItemsTableProps {
     searchableProperties: (keyof Basic)[];
 }
 
-type SortOrder = "asc" | "desc" | undefined;
-type SortBy<T extends MinTableItem> = keyof TableHeaders<T> | "";
+enum SortOrder {
+    Asc = "asc",
+    Desc = "desc",
+    Nothing = ""
+}
+
+type SortBy = keyof TableHeaders<Basic> | "";
 
 const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, deleteItem, editItem, search, searchableProperties }: ItemsTableProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortBy, setSortBy] = useState<SortBy<Basic>>("")
-    const [sortOrder, setSortOrder] = useState<SortOrder>(undefined)
-
-
+    const [sortBy, setSortBy] = useState<SortBy>("")
+    const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.Nothing)
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
         setPage(newPage);
@@ -48,22 +42,22 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, de
         setPage(0);
     };
 
-    const sortData = (newSortBy: SortBy<Basic>, newSortOrder: SortOrder) => {
+    const sortData = (newSortBy: SortBy, newSortOrder: SortOrder) => {
         return items.sort((i: Basic, j: Basic) => {
             if (!(newSortOrder === undefined || ["other", "actions", "type"].includes(newSortBy) || newSortBy === "")) {
                 if (!i[newSortBy] || !j[newSortBy]) {
                     if (i[newSortBy]) {
-                        return newSortOrder === "asc" ? 1 : -1
+                        return newSortOrder === SortOrder.Asc ? 1 : -1
                     } else {
-                        return newSortOrder === "asc" ? -1 : 1;
+                        return newSortOrder === SortOrder.Asc ? -1 : 1;
                     }
                 } else {
                     if (i[newSortBy] < j[newSortBy]) {
-                        return newSortOrder === "asc" ? -1 : 1;
+                        return newSortOrder === SortOrder.Asc ? -1 : 1;
                     }
 
                     else if (i[newSortBy] > j[newSortBy]) {
-                        return newSortOrder === "asc" ? 1 : -1;
+                        return newSortOrder === SortOrder.Asc ? 1 : -1;
                     }
                     else {
                         return 0;
@@ -74,20 +68,20 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, de
         });
     }
 
-    const requestSort = (pSortBy: SortBy<Basic>) => {
+    const requestSort = (pSortBy: SortBy) => {
         let newSortOrder: SortOrder = sortOrder;
-        let newSortBy: SortBy<Basic> = sortBy;
+        let newSortBy: SortBy = sortBy;
         return () => {
             if (pSortBy === sortBy) {
-                if (sortOrder === "desc") {
-                    newSortOrder = "asc";
+                if (sortOrder === SortOrder.Desc) {
+                    newSortOrder = SortOrder.Asc;
                     newSortBy = "";
                     setSortBy(newSortBy);
                 } else {
-                    newSortOrder = "desc"
+                    newSortOrder = SortOrder.Desc
                 }
             } else {
-                newSortOrder = "asc";
+                newSortOrder = SortOrder.Asc;
                 newSortBy = pSortBy;
                 setSortBy(newSortBy);
             }
@@ -106,12 +100,8 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, de
                 {(
                     draggableProvided: DraggableProvided) => {
                     return (
-                        <TableRow
-                            className="TableRow"
-                            ref={draggableProvided.innerRef}
-                            {...draggableProvided.draggableProps}
-                            {...draggableProvided.dragHandleProps}
-                        >
+                        <TableRow className="TableRow" ref={draggableProvided.innerRef} {...draggableProvided.draggableProps}
+                            {...draggableProvided.dragHandleProps}>
                             {
                                 Object.entries(headers).map(([headerKey]) => {
                                     if (headerKey !== "other" && headerKey !== "actions") {
@@ -186,11 +176,8 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, de
                 <TableRow>
                     {Object.entries(headers).map(([key, header]) => {
                         return <TableCell>
-                            <TableSortLabel
-                                active={sortBy === key}
-                                direction={sortOrder}
-                                onClick={requestSort(key as SortBy<Basic>)}
-                            >
+                            <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrder.Nothing ? undefined : sortOrder}
+                                onClick={requestSort(key as SortBy)}>
                                 {header}
                             </TableSortLabel>
                         </TableCell>
@@ -200,29 +187,19 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, de
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="tasksAndEventsForToday" direction="vertical" >
                     {(droppableProvided: DroppableProvided) => (
-                        <TableBody
-                            ref={droppableProvided.innerRef}
-                            {...droppableProvided.droppableProps}>
+                        <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                             {
                                 items.filter((item) => {
                                     return isMatchedWithSearchFilter(item);
                                 }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(renderRow)
                             }
-
                         </TableBody>
                     )}
                 </Droppable>
             </DragDropContext>
-            <TablePagination
-                id="pagination"
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={items.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+            <TablePagination id="pagination" rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
+                rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage} />
         </Table>
     );
 }

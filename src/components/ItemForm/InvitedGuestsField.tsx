@@ -9,9 +9,8 @@ interface InvitedGuestsFieldProps {
 const InvitedGuestsField = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFieldProps) => {
     const [newGuest, setnewGuest] = useState<string>("");
 
-    const handleKeyDown = (evt: React.KeyboardEvent<HTMLDivElement>) => {
-        if (["Enter", "Tab", ","].includes(evt.key)) {
-            evt.preventDefault();
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (["Enter", "Tab", ","].includes(event.key)) {
             const value = newGuest.trim();
             if (value) {
                 invitedGuests ?
@@ -26,22 +25,15 @@ const InvitedGuestsField = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFi
     return (
         <div>
             {invitedGuests?.map((name: string) => (
-                <Chip
-                    label={name} variant="outlined"
+                <Chip label={name} variant="outlined"
                     onDelete={() =>
                         setInvitedGuests(invitedGuests.filter((chip) => chip !== name))
                     }
                 />
             ))}
-            <TextField
-                placeholder="new guest"
-                variant="standard"
-                value={newGuest}
-                onKeyDown={handleKeyDown}
-                onChange={(evt) => setnewGuest(evt.target.value)}
-            />
+            <TextField placeholder="new guest" variant="standard" value={newGuest} onKeyDown={handleKeyDown}
+                onChange={(event) => setnewGuest(event.target.value)} />
         </div>
-
     );
 }
 

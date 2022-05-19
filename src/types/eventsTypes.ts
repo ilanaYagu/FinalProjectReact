@@ -8,10 +8,6 @@ export type EventsContextType = {
     getEvent: (id: string) => Event | undefined;
 };
 
-export type BeginningTimeEventFilterOption = 'Events For Today' | 'Future Events' | "";
 
-export interface BeginningTimeEventFilter {
-    selectedBeginningTimeEvent: BeginningTimeEventFilterOption
-}
 
 

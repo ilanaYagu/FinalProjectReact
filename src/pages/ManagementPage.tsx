@@ -81,7 +81,9 @@ const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOf
             </Button>
             {renderFilters()}
             {renderSubTitle()}
+
             <ItemForm type={type ? type : (itemToUpdate ? (itemToUpdate instanceof Task ? Type.Task : Type.Event) : Type.Task)} enableSwitchType={type ? false : true} />
+
             <ItemsTable headers={headersOfTable} otherColumn={otherColumnOfTable} items={dataTableToShow}
                 setItems={(newItems: Task[]) => setDataTableToShow(newItems)}
                 customRenderers={type === Type.Event ? customRenderersEvents : customRenderers}

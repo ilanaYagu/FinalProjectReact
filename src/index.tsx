@@ -2,13 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import './index.css';
 import * as serviceWorker from './serviceWorker';
+import TasksProvider from './context/tasksContext';
+import EventsProvider from './context/eventsContext';
+import ItemFormProvider from './context/itemFormContext';
+import DeleteItemFormProvider from './context/deleteItemFormContext';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <TasksProvider >
+      <EventsProvider>
+        <ItemFormProvider>
+          <DeleteItemFormProvider>
+            <App />
+          </DeleteItemFormProvider>
+        </ItemFormProvider>
+      </EventsProvider>
+    </TasksProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
