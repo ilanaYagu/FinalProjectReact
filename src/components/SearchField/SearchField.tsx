@@ -1,6 +1,4 @@
-
 import { TextField } from "@mui/material";
-
 
 interface SearchFieldProps {
     setSearch(newSearch: string): void;

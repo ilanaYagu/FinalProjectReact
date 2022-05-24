@@ -1,4 +1,4 @@
-import React, { useState, createContext, PropsWithChildren } from 'react';
+import { useState, createContext, PropsWithChildren } from 'react';
 import { createColor } from 'mui-color';
 import { Event } from '../classes/Event';
 import { EventsContextType } from '../types/eventsTypes';
@@ -57,7 +57,6 @@ const EventsProvider = ({ children }: PropsWithChildren<{}>) => {
     const getEvent = (id: string): Event | undefined => {
         return events.find((event) => id === event.id);
     }
-
 
     return <EventsContext.Provider value={{ events, addEvent, updateEvent, deleteEvent, getEvent }}>{children}</EventsContext.Provider>;
 };

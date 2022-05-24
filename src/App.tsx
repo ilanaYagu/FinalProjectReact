@@ -19,20 +19,22 @@ const theme = createTheme({
     mode: "dark",
     primary: {
       main: "#78536d",
+      contrastText: "#fff"
     },
     divider: blueGrey[700],
     secondary: {
       main: '#f2cbe7',
+      contrastText: "#fff"
     },
     background: {
       default: grey[900],
       paper: grey[900],
     },
     text: {
-      primary: '#fff',
-      secondary: '#fff',
-      disabled: '#ffeaea',
-    }
+      primary: '#fff !important',
+      secondary: '#fff !important',
+      disabled: '#fff',
+    },
   },
 });
 

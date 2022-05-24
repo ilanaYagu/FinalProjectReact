@@ -7,17 +7,18 @@ interface InvitedGuestsFieldProps {
 }
 
 const InvitedGuestsField = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFieldProps) => {
-    const [newGuest, setnewGuest] = useState<string>("");
+    const [newGuest, setNewGuest] = useState<string>("");
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (["Enter", "Tab", ","].includes(event.key)) {
+            event.preventDefault();
             const value = newGuest.trim();
             if (value) {
                 invitedGuests ?
                     setInvitedGuests([...invitedGuests, newGuest])
                     :
                     setInvitedGuests([newGuest])
-                setnewGuest("");
+                setNewGuest("");
             }
         }
     };
@@ -32,7 +33,7 @@ const InvitedGuestsField = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFi
                 />
             ))}
             <TextField placeholder="new guest" variant="standard" value={newGuest} onKeyDown={handleKeyDown}
-                onChange={(event) => setnewGuest(event.target.value)} />
+                onChange={(event) => setNewGuest(event.target.value)} />
         </div>
     );
 }

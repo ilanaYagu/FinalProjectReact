@@ -1,7 +1,6 @@
-import React, { useState, createContext, PropsWithChildren } from 'react';
+import { useState, createContext, PropsWithChildren } from 'react';
 import { Basic } from '../classes/Basic';
 import { ItemFormContextType } from '../types/generalTypes';
-
 
 export const ItemFormContext = createContext<ItemFormContextType>({
     itemToUpdate: "",
@@ -12,7 +11,6 @@ export const ItemFormContext = createContext<ItemFormContextType>({
 });
 
 const ItemFormProvider = ({ children }: PropsWithChildren<{}>) => {
-
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [itemToUpdate, setItemToUpdate] = useState<Basic | "">("");
 
@@ -28,8 +26,8 @@ const ItemFormProvider = ({ children }: PropsWithChildren<{}>) => {
 
     const handleOpenCreateForm = (): void => {
         setIsFormDialogOpen(true);
-    }
 
+    }
 
     return <ItemFormContext.Provider value={{ isFormDialogOpen, itemToUpdate, handleCloseDialog, handleOpenUpdateForm, handleOpenCreateForm }}>{children}</ItemFormContext.Provider>;
 };

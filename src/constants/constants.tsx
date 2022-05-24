@@ -13,7 +13,6 @@ import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
 import { Basic } from "../classes/Basic";
 
-
 export const columnsForTasksTable: TableHeaders<Task> = {
     type: "Type",
     priority: "Priority",
@@ -61,9 +60,9 @@ export const priorityOptions: Priority[] = Object.values(Priority);
 export const customRenderers = {
     type: (it: Basic) => (
         it instanceof Task ?
-            it.priority === "Low" ?
+            it.priority === Priority.Low ?
                 <AssignmentIcon />
-                : it.priority === "Top" ?
+                : it.priority === Priority.Top ?
                     <AssignmentLateIcon sx={{ color: pink[400] }} /> :
                     <AssignmentIcon sx={{ color: green[500] }} />
             :
@@ -71,9 +70,9 @@ export const customRenderers = {
     ),
     priority: (it: Basic) => (
         it instanceof Task ?
-            it.priority === "Low" ?
+            it.priority === Priority.Low ?
                 <KeyboardDoubleArrowDownRoundedIcon sx={{ color: green[500] }} />
-                : it.priority === "Top" ?
+                : it.priority === Priority.Top ?
                     <KeyboardDoubleArrowUpRoundedIcon sx={{ color: pink[500] }} /> :
                     <ArrowDownwardRoundedIcon />
             :

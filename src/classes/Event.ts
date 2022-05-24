@@ -1,4 +1,4 @@
-import { Color } from "mui-color";
+import { Color, ColorValue } from "mui-color";
 import { Basic } from "./Basic";
 
 export class Event extends Basic {

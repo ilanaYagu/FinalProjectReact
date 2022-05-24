@@ -13,25 +13,29 @@ import { customRenderers, customRenderersEvents, Type } from "../constants/const
 import DeleteForm from "../components/DeleteForm/DeleteForm";
 import { DeleteItemFormContext } from "../context/deleteItemFormContext";
 import { DeleteItemFormContextType, ItemFormContextType, otherColumnProperties, TableHeaders } from "../types/generalTypes";
-import { makeStyles, createStyles } from "@mui/styles";
+import { makeStyles } from "@mui/styles";
 import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
 import { Basic } from "../classes/Basic";
 import SearchField from "../components/SearchField/SearchField";
 
-const useStyles = makeStyles(() => createStyles({
+const useStyles = makeStyles({
     addButton: {
         fontWeight: 'bold !important',
-        margin: '2% !important'
-    },
-    subTitle: {
-        color: "#e4dce1"
+        margin: '1% !important',
     },
     filtersTitle: {
-        marginTop: "0.5%",
+        marginTop: "0.7%",
         marginRight: "0.5%"
+    },
+    filterBox: {
+        marginTop: "2%"
+    },
+    noItems: {
+        textAlign: "center",
+        margin: "10%",
     }
-}));
+});
 
 interface ManagementPageProps {
     type?: Type;
@@ -46,11 +50,11 @@ const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOf
     const classes = useStyles();
     const [dataTableToShow, setDataTableToShow] = useState<Basic[]>(allDataTable);
     const [search, setSearch] = useState<string>("");
-    const { handleOpenCreateForm, handleOpenUpdateForm, itemToUpdate } = useContext<ItemFormContextType>(ItemFormContext);
-    const { itemToDelete, handleOpenDeleteDialog } = useContext<DeleteItemFormContextType>(DeleteItemFormContext);
+    const { handleOpenCreateForm, itemToUpdate, isFormDialogOpen } = useContext<ItemFormContextType>(ItemFormContext);
+    const { itemToDelete, isDeleteDialogOpen } = useContext<DeleteItemFormContextType>(DeleteItemFormContext);
 
     const renderFilters = () => {
-        return <Box display="flex" style={{ marginTop: 20 }}>
+        return <Box display="flex" className={classes.filterBox}>
             <div className={classes.filtersTitle}>Quick Filters:</div>
             {
                 !type ?
@@ -66,9 +70,9 @@ const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOf
 
     const renderSubTitle = () => {
         return (type ?
-            <h4 className={classes.subTitle}>Total num of {type.toLowerCase()}s: {allDataTable.length}</h4>
+            <h4>Total {type}s: {allDataTable.length}</h4>
             :
-            <h4 className={classes.subTitle}>Total num of tasks: {todayTasks?.length} Total num of events: {todayEvents?.length}</h4>
+            <h4>Total Tasks: {todayTasks?.length}, Total Events: {todayEvents?.length}</h4>
         )
     }
 
@@ -81,15 +85,20 @@ const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOf
             </Button>
             {renderFilters()}
             {renderSubTitle()}
+            {isFormDialogOpen &&
+                <ItemForm type={type ? type : (itemToUpdate ? (itemToUpdate instanceof Task ? Type.Task : Type.Event) : Type.Task)} enableSwitchType={type ? false : true} />}
 
-            <ItemForm type={type ? type : (itemToUpdate ? (itemToUpdate instanceof Task ? Type.Task : Type.Event) : Type.Task)} enableSwitchType={type ? false : true} />
+            {
+                dataTableToShow.length > 0 ?
+                    <ItemsTable headers={headersOfTable} otherColumn={otherColumnOfTable} items={dataTableToShow}
+                        setItems={(newItems: Task[]) => setDataTableToShow(newItems)}
+                        customRenderers={type === Type.Event ? customRenderersEvents : customRenderers}
+                        search={search} searchableProperties={["title"]} />
+                    :
+                    <h1 className={classes.noItems}>NO ITEMS</h1>
+            }
 
-            <ItemsTable headers={headersOfTable} otherColumn={otherColumnOfTable} items={dataTableToShow}
-                setItems={(newItems: Task[]) => setDataTableToShow(newItems)}
-                customRenderers={type === Type.Event ? customRenderersEvents : customRenderers}
-                deleteItem={handleOpenDeleteDialog} editItem={handleOpenUpdateForm} search={search} searchableProperties={["title"]} />
-
-            {itemToDelete != "" &&
+            {isDeleteDialogOpen && itemToDelete != "" &&
                 <DeleteForm item={itemToDelete} />}
         </Box>
     );

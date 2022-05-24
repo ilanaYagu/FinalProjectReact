@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { IconButton, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
-import { DragDropContext, Draggable, DraggableProvided, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { CustomRenderers, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
-import './ItemsTable.css';
+import React, { useState, useContext } from "react";
+import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
+import { DragDropContext, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
+import { CustomRenderers, DeleteItemFormContextType, ItemFormContextType, otherColumnProperties, TableHeaders } from "../../types/generalTypes";
 import { Basic } from "../../classes/Basic";
+import ItemInTable from "./ItemInTable";
+import { ItemFormContext } from "../../context/itemFormContext";
+import { DeleteItemFormContext } from "../../context/deleteItemFormContext";
+import { makeStyles } from "@mui/styles";
 
 interface ItemsTableProps {
     items: Basic[];
@@ -13,8 +14,6 @@ interface ItemsTableProps {
     headers: TableHeaders<Basic>;
     customRenderers?: CustomRenderers<Basic>;
     otherColumn?: otherColumnProperties<Basic>;
-    deleteItem(item: Basic): void;
-    editItem(item?: Basic): void;
     search: string;
     searchableProperties: (keyof Basic)[];
 }
@@ -27,11 +26,25 @@ enum SortOrder {
 
 type SortBy = keyof TableHeaders<Basic> | "";
 
-const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, deleteItem, editItem, search, searchableProperties }: ItemsTableProps) => {
+const useStyles = makeStyles({
+    pagination: {
+        overflow: "inherit !important"
+    },
+    header: {
+        fontWeight: "bold !important",
+        fontSize: "18px !important",
+        whiteSpace: "nowrap",
+    }
+});
+
+const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, search, searchableProperties }: ItemsTableProps) => {
+    const classes = useStyles();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortBy, setSortBy] = useState<SortBy>("")
-    const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.Nothing)
+    const [sortBy, setSortBy] = useState<SortBy>("");
+    const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.Nothing);
+    const { handleOpenUpdateForm } = useContext<ItemFormContextType>(ItemFormContext);
+    const { handleOpenDeleteDialog } = useContext<DeleteItemFormContextType>(DeleteItemFormContext);
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
         setPage(newPage);
@@ -90,70 +103,45 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, de
         };
     }
 
-    const renderRow = (item: Basic, index: number) => {
-        return (
-            <Draggable
-                key={item.id + " " + index}
-                draggableId={item.id + " " + index}
-                index={index}
-            >
-                {(
-                    draggableProvided: DraggableProvided) => {
-                    return (
-                        <TableRow className="TableRow" ref={draggableProvided.innerRef} {...draggableProvided.draggableProps}
-                            {...draggableProvided.dragHandleProps}>
-                            {
-                                Object.entries(headers).map(([headerKey]) => {
-                                    if (headerKey !== "other" && headerKey !== "actions") {
-                                        const customRenderer = customRenderers?.[headerKey];
-                                        return <TableCell>
-                                            {
-                                                customRenderer ?
-                                                    customRenderer(item) : headerKey in item ? item[headerKey as keyof Basic]
-                                                        : ""
-                                            }
-                                        </TableCell>
-                                    }
-                                    return <></>;
-                                })
-                            }
-                            {
-                                otherColumn &&
-                                <TableCell>
-                                    {
-                                        Object.entries(otherColumn).map(([key, value]) => {
-                                            return item[key as keyof Basic] ?
-                                                <div className="otherInfo">
-                                                    <em>{value}</em><br /> {item[key as keyof Basic]}
-                                                </div>
-                                                :
-                                                " "
-                                        })
-                                    }
-                                </TableCell>
-                            }
-                            <TableCell>
-                                <IconButton aria-label="edit" id="updateTaskButton" color="primary" onClick={() => editItem(item)}>
-                                    <EditIcon />
-                                </IconButton>
-                                <IconButton aria-label="delete" id="deleteTaskButton" onClick={() => deleteItem(item)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    );
-                }}
-            </Draggable>)
+    const renderHeader = () => {
+        return <TableHead>
+            <TableRow>
+                {Object.entries(headers).map(([key, header]) => {
+                    return <TableCell className={classes.header} align="center">
+                        <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrder.Nothing ? undefined : sortOrder}
+                            onClick={requestSort(key as SortBy)}>
+                            {header}
+                        </TableSortLabel>
+                    </TableCell>
+                })}
+            </TableRow>
+        </TableHead>
+    }
+
+    const renderBody = () => {
+        return <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="items" direction="vertical" >
+                {(droppableProvided: DroppableProvided) => (
+                    <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+                        {
+                            items.filter((item) => {
+                                return isMatchedWithSearchFilter(item);
+                            }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(renderRowInTableBody)
+                        }
+                    </TableBody>
+                )}
+            </Droppable>
+        </DragDropContext>
+    }
+
+    const renderRowInTableBody = (item: Basic, index: number) => {
+        return <ItemInTable item={item} index={index} headers={headers} customRenderers={customRenderers} otherColumn={otherColumn} deleteItem={handleOpenDeleteDialog} editItem={handleOpenUpdateForm} />
     }
 
     const handleDragEnd = (result: DropResult) => {
-        if (!result.destination) {
+        if (!result.destination || result.destination.index === result.source.index) {
             return;
         }
-        if (result.destination.index === result.source.index) {
-            return;
-        }
-
         const temp = [...items];
         const d = temp[result.destination!.index];
         temp[result.destination!.index] = temp[result.source.index];
@@ -172,32 +160,9 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, de
 
     return (
         <Table>
-            <TableHead className="head">
-                <TableRow>
-                    {Object.entries(headers).map(([key, header]) => {
-                        return <TableCell>
-                            <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrder.Nothing ? undefined : sortOrder}
-                                onClick={requestSort(key as SortBy)}>
-                                {header}
-                            </TableSortLabel>
-                        </TableCell>
-                    })}
-                </TableRow>
-            </TableHead>
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="tasksAndEventsForToday" direction="vertical" >
-                    {(droppableProvided: DroppableProvided) => (
-                        <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-                            {
-                                items.filter((item) => {
-                                    return isMatchedWithSearchFilter(item);
-                                }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(renderRow)
-                            }
-                        </TableBody>
-                    )}
-                </Droppable>
-            </DragDropContext>
-            <TablePagination id="pagination" rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
+            {renderHeader()}
+            {renderBody()}
+            <TablePagination className={classes.pagination} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
                 rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage} />
         </Table>

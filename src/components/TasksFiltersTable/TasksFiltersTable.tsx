@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { Task } from '../../classes/Task';
+import { makeStyles } from '@mui/styles';
 
 interface TasksFiltersTableProps {
     setTasks(newTasks: Task[]): void;
@@ -25,7 +26,14 @@ interface TasksFilters {
     priorityFilter: PriorityFilter
 }
 
+const useStyles = makeStyles({
+    filterSelector: {
+        marginRight: "0.5%"
+    }
+});
+
 const TasksFiltersTable = ({ setTasks, allData }: TasksFiltersTableProps) => {
+    const classes = useStyles();
     const [filters, setFilters] = useState<TasksFilters>({
         statusFilter: StatusFilter.All,
         priorityFilter: PriorityFilter.All,
@@ -44,8 +52,7 @@ const TasksFiltersTable = ({ setTasks, allData }: TasksFiltersTableProps) => {
 
     return (
         <>
-            <Select style={{ width: "12%", height: "40px", marginLeft: "9px", marginRight: "9px" }}
-                value={filters.statusFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, statusFilter: event.target.value as StatusFilter })}>
+            <Select className={classes.filterSelector} value={filters.statusFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, statusFilter: event.target.value as StatusFilter })}>
                 {
                     Object.values(StatusFilter).map((value) => {
                         return <MenuItem value={value}>{value}</MenuItem>
@@ -53,8 +60,7 @@ const TasksFiltersTable = ({ setTasks, allData }: TasksFiltersTableProps) => {
                 }
             </Select>
 
-            <Select style={{ width: "12%", height: "40px", marginLeft: "9px", marginRight: "9px" }}
-                value={filters.priorityFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, priorityFilter: event.target.value as PriorityFilter })}>
+            <Select className={classes.filterSelector} value={filters.priorityFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, priorityFilter: event.target.value as PriorityFilter })}>
                 {
                     Object.values(PriorityFilter).map((value) => {
                         return <MenuItem value={value}>{value}</MenuItem>

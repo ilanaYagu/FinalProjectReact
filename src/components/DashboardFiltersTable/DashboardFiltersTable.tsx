@@ -1,23 +1,44 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@mui/material';
-import { FilterDashboardTable } from '../../types/generalTypes';
-import './DashboardFiltersTable.css';
+import { Box, Button } from '@mui/material';
 import { Basic } from '../../classes/Basic';
 import { Task } from '../../classes/Task';
 import { Event } from '../../classes/Event';
+import { Priority, Status } from '../../types/tasksTypes';
+import { makeStyles } from "@mui/styles";
+
+enum FilterTodayTable {
+    OnlyTasks = "Tasks",
+    OnlyEvents = "Events",
+    UncompletedTasks = "Uncompleted tasks",
+    HighPriorityTasks = "High priority tasks"
+}
+
+interface FilterDashboardTable {
+    active: boolean;
+    filter: FilterTodayTable;
+}
 
 interface DashboardFiltersTableProps {
     setDataTable(newData: Basic[]): void;
     allData: Basic[];
 }
 
+const useStyles = makeStyles({
+    filterButton: {
+        marginRight: "1% !important",
+        fontSize: "12px !important",
+        height: "80%"
+    },
+    active: {
+        backgroundColor: "#b599b0 !important"
+    }
+});
+
 const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableProps) => {
+    const classes = useStyles();
     const [filters, setFilters] = useState<FilterDashboardTable[]>([
-        { active: false, label: "Tasks", name: "onlyTasks" },
-        { active: false, label: "Events", name: "onlyEvents" },
-        { active: false, label: "uncompleted tasks", name: "uncompletedTasks" },
-        { active: false, label: "high priority tasks", name: "highPriorityTasks" }
-    ]);
+        { active: false, filter: FilterTodayTable.OnlyTasks }, { active: false, filter: FilterTodayTable.OnlyEvents },
+        { active: false, filter: FilterTodayTable.UncompletedTasks }, { active: false, filter: FilterTodayTable.HighPriorityTasks }]);
 
     useEffect(() => {
         setDataTable(filteredData())
@@ -33,20 +54,20 @@ const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableP
         let isMatch = true;
         filters.map((filter: FilterDashboardTable) => {
             if (filter.active) {
-                switch (filter.name) {
-                    case "onlyTasks": {
+                switch (filter.filter) {
+                    case FilterTodayTable.OnlyTasks: {
                         isMatch = item instanceof Task;
                         break;
                     }
-                    case "onlyEvents": {
+                    case FilterTodayTable.OnlyEvents: {
                         isMatch = item instanceof Event;
                         break;
                     }
-                    case "uncompletedTasks":
-                        isMatch = item instanceof Task && item.status !== "Done";
+                    case FilterTodayTable.UncompletedTasks:
+                        isMatch = item instanceof Task && item.status !== Status.Done;
                         break;
-                    case "highPriorityTasks":
-                        isMatch = item instanceof Task && item.priority === "Top";
+                    case FilterTodayTable.HighPriorityTasks:
+                        isMatch = item instanceof Task && item.priority === Priority.Top;
                         break;
                 }
             }
@@ -58,21 +79,20 @@ const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableP
         const newActiveStatus = !filter.active;
         const nfilters = filters.slice();
         nfilters.forEach((nfilter: FilterDashboardTable) => {
-            nfilter.active = filter.name === nfilter.name ? newActiveStatus : false;
+            nfilter.active = filter.filter === nfilter.filter ? newActiveStatus : false;
         });
         setFilters(nfilters);
     }
 
     return (
-        <div>
+        <Box display="flex">
             {
                 filters.map((filter: FilterDashboardTable) =>
-                    <Button className={filter.active ? "active filterButton" : "filterButton"} variant="contained"
-                        onClick={() => onClickFilter(filter)}>{filter.label}</Button>
-
+                    <Button className={(filter.active ? classes.active + " " : "") + classes.filterButton} variant="contained"
+                        onClick={() => onClickFilter(filter)}>{filter.filter}</Button>
                 )
             }
-        </div>
+        </Box>
     );
 };
 

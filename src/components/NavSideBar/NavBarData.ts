@@ -5,15 +5,15 @@ type IMenuItem = {
 
 export const menu: readonly IMenuItem[] = [
     {
-        title: "Today tasks and events",
+        title: "Today Tasks and Events",
         path: "/dashboard"
     },
     {
-        title: "Tasks list",
+        title: "Tasks",
         path: "/tasks"
     },
     {
-        title: "Events list",
+        title: "Events",
         path: "/events"
     }
 ]

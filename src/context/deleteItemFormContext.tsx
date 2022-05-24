@@ -1,4 +1,4 @@
-import React, { useState, createContext, PropsWithChildren } from 'react';
+import { useState, createContext, PropsWithChildren } from 'react';
 import { Basic } from '../classes/Basic';
 import { DeleteItemFormContextType } from '../types/generalTypes';
 
@@ -10,7 +10,6 @@ export const DeleteItemFormContext = createContext<DeleteItemFormContextType>({
 });
 
 const DeleteItemFormProvider = ({ children }: PropsWithChildren<{}>) => {
-
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<Basic | "">("");
 
@@ -19,12 +18,10 @@ const DeleteItemFormProvider = ({ children }: PropsWithChildren<{}>) => {
         setItemToDelete(item);
     };
 
-
     const handleCloseDeleteDialog = (): void => {
         setIsDeleteDialogOpen(false);
         setItemToDelete("");
     };
-
 
     return <DeleteItemFormContext.Provider value={{ itemToDelete, isDeleteDialogOpen, handleOpenDeleteDialog, handleCloseDeleteDialog }}>{children}</DeleteItemFormContext.Provider>;
 };

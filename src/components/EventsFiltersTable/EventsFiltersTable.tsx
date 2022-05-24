@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Box, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { Event } from '../../classes/Event';
 import { isFutureDate, isToday } from '../../utils/utils';
-
 
 enum BeginningTimeEventFilter {
     TodayEvents = "Today Events",
@@ -38,10 +37,7 @@ const EventsFiltersTable = ({ setEvents, allData }: EventsFiltersTableProps) => 
     }
 
     return (
-        <Select
-            style={{ width: "auto", height: "40px", marginLeft: "9px", marginRight: "9px" }}
-            value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilter)}
-        >
+        <Select value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilter)}>
             {
                 Object.values(BeginningTimeEventFilter).map((value) => {
                     return <MenuItem value={value}>{value}</MenuItem>

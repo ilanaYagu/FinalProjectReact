@@ -1,4 +1,4 @@
-import React, { useState, createContext, PropsWithChildren } from 'react';
+import { useState, createContext, PropsWithChildren } from 'react';
 import { Task } from '../classes/Task';
 import { Priority, Status, TasksContextType } from '../types/tasksTypes';
 
@@ -43,7 +43,6 @@ const TasksProvider = ({ children }: PropsWithChildren<{}>) => {
     const getTask = (id: string): Task | undefined => {
         return tasks.find((task) => id === task.id);
     }
-
 
     return <TasksContext.Provider value={{ tasks, addTask, updateTask, deleteTask, getTask }}>{children}</TasksContext.Provider>;
 };
