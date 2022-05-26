@@ -1,6 +1,13 @@
 import { useState, createContext, PropsWithChildren } from 'react';
 import { Basic } from '../classes/Basic';
-import { ItemFormContextType } from '../types/generalTypes';
+
+export type ItemFormContextType = {
+    itemToUpdate: Basic | "";
+    isFormDialogOpen: boolean;
+    handleCloseDialog(): void;
+    handleOpenUpdateForm(item: Basic): void;
+    handleOpenCreateForm(): void;
+}
 
 export const ItemFormContext = createContext<ItemFormContextType>({
     itemToUpdate: "",

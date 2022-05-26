@@ -1,13 +1,13 @@
 import { TextField } from "@mui/material";
 import { Color, ColorPicker } from "material-ui-color";
-import { Event } from "../../classes/Event";
 import InvitedGuestsField from "./InvitedGuestsField";
 import { getDateTextField } from "./utils";
 import { makeStyles } from "@mui/styles";
+import { EventInputs } from "./types";
 
 interface EventFormProps {
-    eventInputs: Omit<Event, "id" | "title" | "description">;
-    setEventInputs(newTaskInputs: Omit<Event, "id" | "title" | "description">): void;
+    eventInputs: EventInputs;
+    setEventInputs(newEventInputs: EventInputs): void;
     classField: string;
 }
 

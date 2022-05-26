@@ -1,15 +1,13 @@
-import { TasksContext } from './context/tasksContext';
+import { TasksContext, TasksContextType } from './context/tasksContext';
 import { useContext } from "react";
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
 import { NavSideBar } from './components/NavSideBar/NavSideBar';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from '@mui/material';
 import { blueGrey, grey } from '@mui/material/colors';
-import { EventsContext } from './context/eventsContext';
+import { EventsContext, EventsContextType } from './context/eventsContext';
 import ManagementPage from "./pages/ManagementPage";
 import { columnsForEventsTable, columnsForTasksTable, columnsForTodayTasksAndEventsTable, otherColumnForTasksTable, otherColumnForTodayTasksAndEventsTable, Type } from "./constants/constants";
-import { TasksContextType } from './types/tasksTypes';
-import { EventsContextType } from './types/eventsTypes';
 import { filterTodayItems } from './utils/utils';
 import { Event } from './classes/Event';
 import { Task } from './classes/Task';

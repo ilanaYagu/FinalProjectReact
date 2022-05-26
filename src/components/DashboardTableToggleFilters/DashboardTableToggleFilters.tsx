@@ -6,19 +6,19 @@ import { Event } from '../../classes/Event';
 import { Priority, Status } from '../../types/tasksTypes';
 import { makeStyles } from "@mui/styles";
 
-enum FilterTodayTable {
+enum TodayTableFilter {
     OnlyTasks = "Tasks",
     OnlyEvents = "Events",
     UncompletedTasks = "Uncompleted tasks",
     HighPriorityTasks = "High priority tasks"
 }
 
-interface FilterDashboardTable {
+interface DashboardTableFilter {
     active: boolean;
-    filter: FilterTodayTable;
+    filter: TodayTableFilter;
 }
 
-interface DashboardFiltersTableProps {
+interface DashboardTableToggleFiltersProps {
     setDataTable(newData: Basic[]): void;
     allData: Basic[];
 }
@@ -34,11 +34,11 @@ const useStyles = makeStyles({
     }
 });
 
-const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableProps) => {
+const DashboardTableToggleFilters = ({ setDataTable, allData }: DashboardTableToggleFiltersProps) => {
     const classes = useStyles();
-    const [filters, setFilters] = useState<FilterDashboardTable[]>([
-        { active: false, filter: FilterTodayTable.OnlyTasks }, { active: false, filter: FilterTodayTable.OnlyEvents },
-        { active: false, filter: FilterTodayTable.UncompletedTasks }, { active: false, filter: FilterTodayTable.HighPriorityTasks }]);
+    const [filters, setFilters] = useState<DashboardTableFilter[]>([
+        { active: false, filter: TodayTableFilter.OnlyTasks }, { active: false, filter: TodayTableFilter.OnlyEvents },
+        { active: false, filter: TodayTableFilter.UncompletedTasks }, { active: false, filter: TodayTableFilter.HighPriorityTasks }]);
 
     useEffect(() => {
         setDataTable(filteredData())
@@ -52,21 +52,21 @@ const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableP
 
     const isItemMatchFilters = (item: Basic): boolean => {
         let isMatch = true;
-        filters.map((filter: FilterDashboardTable) => {
+        filters.map((filter: DashboardTableFilter) => {
             if (filter.active) {
                 switch (filter.filter) {
-                    case FilterTodayTable.OnlyTasks: {
+                    case TodayTableFilter.OnlyTasks: {
                         isMatch = item instanceof Task;
                         break;
                     }
-                    case FilterTodayTable.OnlyEvents: {
+                    case TodayTableFilter.OnlyEvents: {
                         isMatch = item instanceof Event;
                         break;
                     }
-                    case FilterTodayTable.UncompletedTasks:
+                    case TodayTableFilter.UncompletedTasks:
                         isMatch = item instanceof Task && item.status !== Status.Done;
                         break;
-                    case FilterTodayTable.HighPriorityTasks:
+                    case TodayTableFilter.HighPriorityTasks:
                         isMatch = item instanceof Task && item.priority === Priority.Top;
                         break;
                 }
@@ -75,10 +75,10 @@ const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableP
         return isMatch;
     }
 
-    const onClickFilter = (filter: FilterDashboardTable): void => {
+    const onClickFilter = (filter: DashboardTableFilter): void => {
         const newActiveStatus = !filter.active;
         const nfilters = filters.slice();
-        nfilters.forEach((nfilter: FilterDashboardTable) => {
+        nfilters.forEach((nfilter: DashboardTableFilter) => {
             nfilter.active = filter.filter === nfilter.filter ? newActiveStatus : false;
         });
         setFilters(nfilters);
@@ -87,7 +87,7 @@ const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableP
     return (
         <Box display="flex">
             {
-                filters.map((filter: FilterDashboardTable) =>
+                filters.map((filter: DashboardTableFilter) =>
                     <Button className={(filter.active ? classes.active + " " : "") + classes.filterButton} variant="contained"
                         onClick={() => onClickFilter(filter)}>{filter.filter}</Button>
                 )
@@ -96,5 +96,5 @@ const DashboardFiltersTable = ({ setDataTable, allData }: DashboardFiltersTableP
     );
 };
 
-export default DashboardFiltersTable;
+export default DashboardTableToggleFilters;
 

@@ -1,24 +1,25 @@
 import { Button } from "@mui/material";
 import { Box } from "@mui/system";
 import { useContext, useState } from "react";
-import DashboardFiltersTable from "../components/DashboardFiltersTable/DashboardFiltersTable";
-import EventsFiltersTable from "../components/EventsFiltersTable/EventsFiltersTable";
-import TasksFiltersTable from "../components/TasksFiltersTable/TasksFiltersTable";
-import { ItemFormContext } from "../context/itemFormContext";
+import DashboardTableToggleFilters from "../components/DashboardTableToggleFilters/DashboardTableToggleFilters";
+import EventsTableFilters from "../components/EventsTableFilters/EventsTableFilters";
+import TasksTableFilters from "../components/TasksTableFilters/TasksTableFilters";
+import { ItemFormContext, ItemFormContextType } from "../context/itemFormContext";
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import ItemForm from "../components/ItemForm/ItemForm";
 import ItemsTable from "../components/ItemsTable/ItemsTable";
 import { customRenderers, customRenderersEvents, Type } from "../constants/constants";
 import DeleteForm from "../components/DeleteForm/DeleteForm";
-import { DeleteItemFormContext } from "../context/deleteItemFormContext";
-import { DeleteItemFormContextType, ItemFormContextType, otherColumnProperties, TableHeaders } from "../types/generalTypes";
+import { DeleteItemFormContext, DeleteItemFormContextType } from "../context/deleteItemFormContext";
+import { otherColumnProperties, TableHeaders } from "../types/managementtTableTypes";
 import { makeStyles } from "@mui/styles";
 import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
 import { Basic } from "../classes/Basic";
 import SearchField from "../components/SearchField/SearchField";
 
+const searchableProperties: (keyof Basic)[] = ["title"];
 const useStyles = makeStyles({
     addButton: {
         fontWeight: 'bold !important',
@@ -36,6 +37,7 @@ const useStyles = makeStyles({
         margin: "10%",
     }
 });
+
 
 interface ManagementPageProps {
     type?: Type;
@@ -58,12 +60,12 @@ const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOf
             <div className={classes.filtersTitle}>Quick Filters:</div>
             {
                 !type ?
-                    <DashboardFiltersTable setDataTable={setDataTableToShow} allData={allDataTable} />
+                    <DashboardTableToggleFilters setDataTable={setDataTableToShow} allData={allDataTable} />
                     :
                     type === Type.Task ?
-                        <TasksFiltersTable setTasks={(tasks: Task[]) => setDataTableToShow(tasks)} allData={allDataTable as Task[]} />
+                        <TasksTableFilters setTasks={(tasks: Task[]) => setDataTableToShow(tasks)} allData={allDataTable as Task[]} />
                         :
-                        <EventsFiltersTable setEvents={(events: Event[]) => setDataTableToShow(events)} allData={allDataTable as Event[]} />
+                        <EventsTableFilters setEvents={(events: Event[]) => setDataTableToShow(events)} allData={allDataTable as Event[]} />
             }
         </Box>
     }
@@ -93,7 +95,7 @@ const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOf
                     <ItemsTable headers={headersOfTable} otherColumn={otherColumnOfTable} items={dataTableToShow}
                         setItems={(newItems: Task[]) => setDataTableToShow(newItems)}
                         customRenderers={type === Type.Event ? customRenderersEvents : customRenderers}
-                        search={search} searchableProperties={["title"]} />
+                        search={search} searchableProperties={searchableProperties} />
                     :
                     <h1 className={classes.noItems}>NO ITEMS</h1>
             }

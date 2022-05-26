@@ -8,7 +8,7 @@ import Brightness1RoundedIcon from '@mui/icons-material/Brightness1Rounded';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import { green, pink } from "@mui/material/colors";
-import { otherColumnProperties, TableHeaders } from "../types/generalTypes";
+import { otherColumnProperties, TableHeaders } from "../types/managementtTableTypes";
 import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
 import { Basic } from "../classes/Basic";

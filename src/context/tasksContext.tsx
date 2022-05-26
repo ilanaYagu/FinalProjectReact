@@ -1,6 +1,14 @@
 import { useState, createContext, PropsWithChildren } from 'react';
 import { Task } from '../classes/Task';
-import { Priority, Status, TasksContextType } from '../types/tasksTypes';
+import { Priority, Status } from '../types/tasksTypes';
+
+export type TasksContextType = {
+    tasks: Task[];
+    addTask: (newTask: Task) => void;
+    deleteTask: (id: string) => void;
+    updateTask: (taskToUpdate: Task) => void;
+    getTask: (id: string) => Task | undefined;
+};
 
 export const TasksContext = createContext<TasksContextType>({
     tasks: [],

@@ -1,28 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import TextField from "@mui/material/TextField";
-import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, MenuItem, Select, SelectChangeEvent, TextareaAutosize } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import TextareaAutosize from '@mui/material/TextareaAutosize';
-import { Priority, Status, TasksContextType } from '../../types/tasksTypes';
+import { Priority, Status } from '../../types/tasksTypes';
 import { Type } from '../../constants/constants';
-import { TasksContext } from '../../context/tasksContext';
-import { EventsContextType } from '../../types/eventsTypes';
+import { TasksContext, TasksContextType } from '../../context/tasksContext';
 import { createColor } from 'material-ui-color';
-import { EventsContext } from '../../context/eventsContext';
-import { ItemFormContextType } from '../../types/generalTypes';
-import { ItemFormContext } from '../../context/itemFormContext';
+import { EventsContext, EventsContextType } from '../../context/eventsContext';
+import { ItemFormContext, ItemFormContextType } from '../../context/itemFormContext';
 import { Basic } from '../../classes/Basic';
 import { Task } from '../../classes/Task';
 import { Event } from '../../classes/Event';
 import TaskForm from './TaskForm';
 import EventForm from './EventForm';
 import validator from "validator";
+import { EventInputs, TaskInputs } from './types';
 
 interface ItemFormProps {
     type: Type;
@@ -57,11 +48,11 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
     const { handleCloseDialog, itemToUpdate, isFormDialogOpen } = useContext(ItemFormContext) as ItemFormContextType;
 
     let [baseInputs, setBaseInputs] = useState<Basic>({ title: "", id: "", description: "" })
-    let [taskInputs, setTaskInputs] = useState<Omit<Task, "id" | "title" | "description">>({
+    let [taskInputs, setTaskInputs] = useState<TaskInputs>({
         status: Status.Open, estimatedTime: "", priority: Priority.Low,
         review: " ", timeSpent: "", untilDate: "",
     });
-    let [eventInputs, setEventInputs] = useState<Omit<Event, "id" | "title" | "description">>({
+    let [eventInputs, setEventInputs] = useState<EventInputs>({
         beginningTime: "", endingTime: "", color: createColor("#DFBEBE"), location: "",
         notificationTime: "", invitedGuests: []
     })

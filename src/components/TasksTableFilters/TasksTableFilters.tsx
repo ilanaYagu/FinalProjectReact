@@ -3,7 +3,7 @@ import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { Task } from '../../classes/Task';
 import { makeStyles } from '@mui/styles';
 
-interface TasksFiltersTableProps {
+interface TasksTableFiltersProps {
     setTasks(newTasks: Task[]): void;
     allData: Task[];
 }
@@ -32,7 +32,7 @@ const useStyles = makeStyles({
     }
 });
 
-const TasksFiltersTable = ({ setTasks, allData }: TasksFiltersTableProps) => {
+const TasksTableFilters = ({ setTasks, allData }: TasksTableFiltersProps) => {
     const classes = useStyles();
     const [filters, setFilters] = useState<TasksFilters>({
         statusFilter: StatusFilter.All,
@@ -71,5 +71,5 @@ const TasksFiltersTable = ({ setTasks, allData }: TasksFiltersTableProps) => {
     );
 };
 
-export default TasksFiltersTable;
+export default TasksTableFilters;
 

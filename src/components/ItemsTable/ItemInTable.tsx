@@ -3,7 +3,7 @@ import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import { Basic } from '../../classes/Basic';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CustomRenderers, otherColumnProperties, TableHeaders } from '../../types/generalTypes';
+import { CustomRenderers, otherColumnProperties, TableHeaders } from '../../types/managementtTableTypes';
 import { makeStyles } from "@material-ui/styles";
 
 interface ItemInTableProps {

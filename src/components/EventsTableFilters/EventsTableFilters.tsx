@@ -9,17 +9,17 @@ enum BeginningTimeEventFilter {
     AllEvents = "All Events"
 }
 
-interface EventsFiltersTableProps {
+interface EventsTableFiltersProps {
     setEvents(events: Event[]): void;
     allData: Event[];
 }
 
-const EventsFiltersTable = ({ setEvents, allData }: EventsFiltersTableProps) => {
+const EventsTableFilters = ({ setEvents, allData }: EventsTableFiltersProps) => {
     const [filter, setFilter] = useState<BeginningTimeEventFilter>(BeginningTimeEventFilter.AllEvents);
 
     useEffect(() => {
         setEvents(filteredEvents());
-    }, [filter, allData])
+    }, [filter, allData, setEvents])
 
     const filteredEvents = (): Event[] => {
         return allData.filter((event: Event) => {
@@ -47,5 +47,5 @@ const EventsFiltersTable = ({ setEvents, allData }: EventsFiltersTableProps) => 
     );
 };
 
-export default EventsFiltersTable;
+export default EventsTableFilters;
 

@@ -1,7 +1,14 @@
 import { useState, createContext, PropsWithChildren } from 'react';
 import { createColor } from 'mui-color';
 import { Event } from '../classes/Event';
-import { EventsContextType } from '../types/eventsTypes';
+
+export type EventsContextType = {
+    events: Event[];
+    addEvent: (event: Event) => void;
+    deleteEvent: (id: string) => void;
+    updateEvent: (eventToUpdate: Event) => void;
+    getEvent: (id: string) => Event | undefined;
+};
 
 export const EventsContext = createContext<EventsContextType>({
     events: [],

@@ -1,5 +1,3 @@
-import { Task } from "../classes/Task";
-
 
 export enum Priority {
     Low = "Low",
@@ -12,12 +10,6 @@ export enum Status {
     InProgress = "In Progress",
     Done = "Done"
 }
-export type TasksContextType = {
-    tasks: Task[];
-    addTask: (newTask: Task) => void;
-    deleteTask: (id: string) => void;
-    updateTask: (taskToUpdate: Task) => void;
-    getTask: (id: string) => Task | undefined;
-};
+
 
 

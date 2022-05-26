@@ -1,18 +1,18 @@
 import { Status } from '../../types/tasksTypes';
-import { Task } from '../../classes/Task';
 import { Autocomplete, TextareaAutosize, TextField } from "@mui/material";
 import { priorityOptions, statusesOptions } from "../../constants/constants";
 import { getDateTextField } from './utils';
+import { TaskInputs } from './types';
 
 interface TaskFormProps {
-    taskInputs: Omit<Task, "id" | "title" | "description">;
-    setTaskInputs(newTaskInputs: Omit<Task, "id" | "title" | "description">): void;
+    taskInputs: TaskInputs;
+    setTaskInputs(newTaskInputs: TaskInputs): void;
     classField: string;
 }
 
 function TaskForm({ taskInputs, setTaskInputs, classField }: TaskFormProps) {
 
-    const getAutoComplete = (field: keyof Omit<Task, "id" | "title" | "description">, options: string[], label: string) => {
+    const getAutoComplete = (field: keyof TaskInputs, options: string[], label: string) => {
         return <Autocomplete className={classField} freeSolo defaultValue={taskInputs[field]} options={options}
             onChange={(event: React.FormEvent) => {
                 let newValue: string = (event.target as HTMLInputElement).textContent as string;

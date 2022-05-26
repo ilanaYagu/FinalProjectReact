@@ -1,6 +1,12 @@
 import { useState, createContext, PropsWithChildren } from 'react';
 import { Basic } from '../classes/Basic';
-import { DeleteItemFormContextType } from '../types/generalTypes';
+
+export type DeleteItemFormContextType = {
+    itemToDelete: Basic | "";
+    isDeleteDialogOpen: boolean;
+    handleCloseDeleteDialog(): void;
+    handleOpenDeleteDialog(item: Basic): void;
+}
 
 export const DeleteItemFormContext = createContext<DeleteItemFormContextType>({
     itemToDelete: "",
