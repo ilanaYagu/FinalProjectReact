@@ -1,16 +1,16 @@
-import { TasksContext, TasksContextType } from './context/tasksContext';
-import { useContext } from "react";
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
 import { NavSideBar } from './components/NavSideBar/NavSideBar';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from '@mui/material';
 import { blueGrey, grey } from '@mui/material/colors';
-import { EventsContext, EventsContextType } from './context/eventsContext';
 import ManagementPage from "./pages/ManagementPage";
-import { columnsForEventsTable, columnsForTasksTable, columnsForTodayTasksAndEventsTable, otherColumnForTasksTable, otherColumnForTodayTasksAndEventsTable, Type } from "./constants/constants";
-import { filterTodayItems } from './utils/utils';
+import { columnsForEventsTable, columnsForTasksTable, columnsForTodayTasksAndEventsTable, otherColumnForTasksTable, otherColumnForTodayTasksAndEventsTable } from "./constants";
+import { filterTodayItems } from './utils';
 import { Event } from './classes/Event';
 import { Task } from './classes/Task';
+import { useSelector } from 'react-redux';
+import { RootState } from './app/store';
+import { Type } from './types/managementTableTypes';
 
 const theme = createTheme({
   palette: {
@@ -37,8 +37,8 @@ const theme = createTheme({
 });
 
 const App = () => {
-  const { events } = useContext<EventsContextType>(EventsContext);
-  const { tasks } = useContext<TasksContextType>(TasksContext);
+  const events = useSelector((state: RootState) => state.events.events);
+  const tasks = useSelector((state: RootState) => state.tasks.tasks);
   const todayTasks = filterTodayItems(tasks) as Task[];
   const todayEvents = filterTodayItems(events) as Event[];
 

@@ -3,17 +3,19 @@ import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import { Basic } from '../../classes/Basic';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { CustomRenderers, otherColumnProperties, TableHeaders } from '../../types/managementtTableTypes';
+import { handleOpenDeleteDialog } from "../../feature/deleteItemFormSlice";
+import { CustomRenderers, OtherColumnProperties, TableHeaders } from '../../types/managementTableTypes';
 import { makeStyles } from "@material-ui/styles";
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../app/store';
+import { handleOpenUpdateForm } from '../../feature/itemFormSlice';
 
 interface ItemInTableProps {
     item: Basic;
     index: number;
     headers: TableHeaders<Basic>;
     customRenderers?: CustomRenderers<Basic>;
-    otherColumn?: otherColumnProperties<Basic>;
-    deleteItem(item: Basic): void;
-    editItem(item?: Basic): void;
+    otherColumn?: OtherColumnProperties<Basic>;
 }
 
 const useStyles = makeStyles({
@@ -31,8 +33,9 @@ const useStyles = makeStyles({
     }
 });
 
-const ItemInTable = ({ item, index, headers, customRenderers, otherColumn, deleteItem, editItem }: ItemInTableProps) => {
+const ItemInTable = ({ item, index, headers, customRenderers, otherColumn }: ItemInTableProps) => {
     const classes = useStyles();
+    const dispatch = useDispatch<AppDispatch>();
 
     return <Draggable key={item.id + " " + index} draggableId={item.id + " " + index} index={index}>
         {(
@@ -74,10 +77,10 @@ const ItemInTable = ({ item, index, headers, customRenderers, otherColumn, delet
                         </TableCell>
                     }
                     <TableCell className={classes.tableCell} align="center">
-                        <IconButton color="primary" onClick={() => editItem(item)}>
+                        <IconButton color="primary" onClick={() => dispatch(handleOpenUpdateForm(item))}>
                             <EditIcon />
                         </IconButton>
-                        <IconButton onClick={() => deleteItem(item)}>
+                        <IconButton onClick={() => dispatch(handleOpenDeleteDialog(item))}>
                             <DeleteIcon />
                         </IconButton>
                     </TableCell>

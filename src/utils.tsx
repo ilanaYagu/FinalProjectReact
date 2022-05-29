@@ -1,6 +1,6 @@
-import { Basic } from "../classes/Basic";
-import { Event } from "../classes/Event";
-import { Task } from "../classes/Task";
+import { Basic } from "./classes/Basic";
+import { Event } from "./classes/Event";
+import { Task } from "./classes/Task";
 
 
 export const isFutureDate = (date: Date) => {

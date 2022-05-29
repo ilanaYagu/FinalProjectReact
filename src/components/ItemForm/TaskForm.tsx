@@ -1,8 +1,10 @@
-import { Status } from '../../types/tasksTypes';
+import { Priority, Status } from '../../types/tasksTypes';
 import { Autocomplete, TextareaAutosize, TextField } from "@mui/material";
-import { priorityOptions, statusesOptions } from "../../constants/constants";
 import { getDateTextField } from './utils';
-import { TaskInputs } from './types';
+import { TaskInputs } from './ItemForm';
+
+const statusesOptions: Status[] = Object.values(Status);
+const priorityOptions: Priority[] = Object.values(Priority);
 
 interface TaskFormProps {
     taskInputs: TaskInputs;

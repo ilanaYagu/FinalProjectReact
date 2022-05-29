@@ -1,23 +1,24 @@
 import { Button } from "@mui/material";
 import { Box } from "@mui/system";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import DashboardTableToggleFilters from "../components/DashboardTableToggleFilters/DashboardTableToggleFilters";
 import EventsTableFilters from "../components/EventsTableFilters/EventsTableFilters";
 import TasksTableFilters from "../components/TasksTableFilters/TasksTableFilters";
-import { ItemFormContext, ItemFormContextType } from "../context/itemFormContext";
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import ItemForm from "../components/ItemForm/ItemForm";
 import ItemsTable from "../components/ItemsTable/ItemsTable";
-import { customRenderers, customRenderersEvents, Type } from "../constants/constants";
+import { customRenderers, customRenderersEvents } from "../constants";
 import DeleteForm from "../components/DeleteForm/DeleteForm";
-import { DeleteItemFormContext, DeleteItemFormContextType } from "../context/deleteItemFormContext";
-import { otherColumnProperties, TableHeaders } from "../types/managementtTableTypes";
+import { OtherColumnProperties, TableHeaders, Type } from "../types/managementTableTypes";
 import { makeStyles } from "@mui/styles";
 import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
 import { Basic } from "../classes/Basic";
 import SearchField from "../components/SearchField/SearchField";
+import { useDispatch, useSelector } from "react-redux";
+import { handleOpenCreateForm } from "../feature/itemFormSlice";
+import { AppDispatch, RootState } from "../app/store";
 
 const searchableProperties: (keyof Basic)[] = ["title"];
 const useStyles = makeStyles({
@@ -45,15 +46,22 @@ interface ManagementPageProps {
     todayEvents?: Basic[];
     todayTasks?: Basic[];
     headersOfTable: TableHeaders<Task> | TableHeaders<Event>;
-    otherColumnOfTable?: otherColumnProperties<Task> | otherColumnProperties<Event>;
+    otherColumnOfTable?: OtherColumnProperties<Task> | OtherColumnProperties<Event>;
 }
 
 const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOfTable, otherColumnOfTable }: ManagementPageProps) => {
     const classes = useStyles();
     const [dataTableToShow, setDataTableToShow] = useState<Basic[]>(allDataTable);
     const [search, setSearch] = useState<string>("");
-    const { handleOpenCreateForm, itemToUpdate, isFormDialogOpen } = useContext<ItemFormContextType>(ItemFormContext);
-    const { itemToDelete, isDeleteDialogOpen } = useContext<DeleteItemFormContextType>(DeleteItemFormContext);
+
+    const { isDeleteDialogOpen, itemToDelete } = useSelector(
+        (state: RootState) => state.deleteItemForm
+    );
+    const { isFormDialogOpen, itemToUpdate } = useSelector(
+        (state: RootState) => state.itemForm
+    );
+
+    const dispatch = useDispatch<AppDispatch>();
 
     const renderFilters = () => {
         return <Box display="flex" className={classes.filterBox}>
@@ -82,14 +90,13 @@ const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOf
         <Box>
             <h1>{type ? type + "s" : "Events and Tasks For Today"} Management</h1>
             <SearchField setSearch={setSearch} />
-            <Button variant="contained" className={classes.addButton} onClick={handleOpenCreateForm} startIcon={type === Type.Event ? <CalendarMonthRoundedIcon /> : <AddTaskIcon />}>
+            <Button variant="contained" className={classes.addButton} onClick={() => dispatch(handleOpenCreateForm())} startIcon={type === Type.Event ? <CalendarMonthRoundedIcon /> : <AddTaskIcon />}>
                 Add {type}
             </Button>
             {renderFilters()}
             {renderSubTitle()}
             {isFormDialogOpen &&
                 <ItemForm type={type ? type : (itemToUpdate ? (itemToUpdate instanceof Task ? Type.Task : Type.Event) : Type.Task)} enableSwitchType={type ? false : true} />}
-
             {
                 dataTableToShow.length > 0 ?
                     <ItemsTable headers={headersOfTable} otherColumn={otherColumnOfTable} items={dataTableToShow}

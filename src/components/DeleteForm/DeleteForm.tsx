@@ -1,16 +1,12 @@
-import { useContext } from 'react';
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import { DeleteItemFormContext, DeleteItemFormContextType } from '../../context/deleteItemFormContext';
-import { TasksContext, TasksContextType } from '../../context/tasksContext';
-import { EventsContext, EventsContextType } from '../../context/eventsContext';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { deleteTask } from "../../feature/tasksSlice";
+import { deleteEvent } from "../../feature/eventsSlice";
+import { handleCloseDeleteDialog } from "../../feature/deleteItemFormSlice";
 import { Basic } from '../../classes/Basic';
 import { Task } from '../../classes/Task';
 import { makeStyles } from '@mui/styles';
+import { AppDispatch, RootState } from '../../app/store';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface DeleteItemFormProps {
     item: Basic;
@@ -25,14 +21,13 @@ const useStyles = makeStyles({
 
 function DeleteItemForm({ item }: DeleteItemFormProps) {
     const classes = useStyles();
-    const { handleCloseDeleteDialog, isDeleteDialogOpen } = useContext(DeleteItemFormContext) as DeleteItemFormContextType;
-    const { deleteTask } = useContext(TasksContext) as TasksContextType;
-    const { deleteEvent } = useContext(EventsContext) as EventsContextType;
+    const isDeleteDialogOpen = useSelector((state: RootState) => state.deleteItemForm.isDeleteDialogOpen);
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleDelete = (): void => {
         item instanceof Task ?
-            deleteTask(item.id) : deleteEvent(item.id);
-        handleCloseDeleteDialog();
+            dispatch(deleteTask(item.id)) : dispatch(deleteEvent(item.id));
+        dispatch(handleCloseDeleteDialog());
     }
 
     return (
@@ -44,7 +39,7 @@ function DeleteItemForm({ item }: DeleteItemFormProps) {
                 </DialogContentText>
             </DialogContent>
             <DialogActions className={classes.dialogActions}>
-                <Button onClick={handleCloseDeleteDialog} variant="outlined" color="secondary" >
+                <Button onClick={() => dispatch(handleCloseDeleteDialog())} variant="outlined" color="secondary" >
                     Cancel
                 </Button>
                 <Button type="submit" variant="contained" onClick={() => handleDelete()} >

@@ -3,23 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import TasksProvider from './context/tasksContext';
-import EventsProvider from './context/eventsContext';
-import ItemFormProvider from './context/itemFormContext';
-import DeleteItemFormProvider from './context/deleteItemFormContext';
+import { store } from "./app/store";
+import { Provider } from 'react-redux';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <TasksProvider >
-      <EventsProvider>
-        <ItemFormProvider>
-          <DeleteItemFormProvider>
-            <App />
-          </DeleteItemFormProvider>
-        </ItemFormProvider>
-      </EventsProvider>
-    </TasksProvider>
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

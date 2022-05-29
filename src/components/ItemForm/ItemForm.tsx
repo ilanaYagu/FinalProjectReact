@@ -1,19 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, MenuItem, Select, SelectChangeEvent, TextareaAutosize } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Priority, Status } from '../../types/tasksTypes';
-import { Type } from '../../constants/constants';
-import { TasksContext, TasksContextType } from '../../context/tasksContext';
+import { updateTask, addTask } from "../../feature/tasksSlice";
+import { updateEvent, addEvent } from '../../feature/eventsSlice';
+import { handleCloseDialog } from '../../feature/itemFormSlice';
 import { createColor } from 'material-ui-color';
-import { EventsContext, EventsContextType } from '../../context/eventsContext';
-import { ItemFormContext, ItemFormContextType } from '../../context/itemFormContext';
 import { Basic } from '../../classes/Basic';
 import { Task } from '../../classes/Task';
 import { Event } from '../../classes/Event';
 import TaskForm from './TaskForm';
 import EventForm from './EventForm';
 import validator from "validator";
-import { EventInputs, TaskInputs } from './types';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../app/store';
+import { Type } from '../../types/managementTableTypes';
+
+export type TaskInputs = Omit<Task, "id" | "title" | "description">;
+
+export type EventInputs = Omit<Event, "id" | "title" | "description">;
 
 interface ItemFormProps {
     type: Type;
@@ -43,9 +48,9 @@ const useStyles = makeStyles({
 
 const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
     const classes = useStyles();
-    const { addTask, updateTask } = useContext(TasksContext) as TasksContextType;
-    const { addEvent, updateEvent } = useContext(EventsContext) as EventsContextType;
-    const { handleCloseDialog, itemToUpdate, isFormDialogOpen } = useContext(ItemFormContext) as ItemFormContextType;
+    const dispatch = useDispatch<AppDispatch>();
+    const itemToUpdate = useSelector((state: RootState) => state.itemForm.itemToUpdate);
+    const isFormDialogOpen = useSelector((state: RootState) => state.itemForm.isFormDialogOpen);
 
     let [baseInputs, setBaseInputs] = useState<Basic>({ title: "", id: "", description: "" })
     let [taskInputs, setTaskInputs] = useState<TaskInputs>({
@@ -77,15 +82,15 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
         if (isValidFields()) {
             if (!itemToUpdate) {
                 formType as string === Type.Task ?
-                    addTask({ ...taskInputs, ...baseInputs }) :
-                    addEvent({ ...eventInputs, ...baseInputs });
-                handleCloseDialog();
+                    dispatch(addTask({ ...taskInputs, ...baseInputs })) :
+                    dispatch(addEvent({ ...eventInputs, ...baseInputs }));
+                dispatch(handleCloseDialog());
             }
             else {
                 formType as string === Type.Task ?
-                    updateTask({ ...taskInputs, ...baseInputs }) :
-                    updateEvent({ ...eventInputs, ...baseInputs });
-                handleCloseDialog();
+                    dispatch(updateTask({ ...taskInputs, ...baseInputs })) :
+                    dispatch(updateEvent({ ...eventInputs, ...baseInputs }));
+                dispatch(handleCloseDialog());
             }
         }
     }
@@ -120,7 +125,7 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
 
     const renderDialogActions = (): JSX.Element => {
         return <DialogActions className={classes.dialogActions}>
-            <Button onClick={handleCloseDialog} color="secondary" variant="outlined"> Cancel </Button>
+            <Button onClick={() => dispatch(handleCloseDialog())} color="secondary" variant="outlined"> Cancel </Button>
             <Button color="primary" type="submit" variant="contained"> {buttonText} </Button>
         </DialogActions>
     }
@@ -140,7 +145,7 @@ const ItemForm = ({ type, enableSwitchType }: ItemFormProps) => {
     }
 
     return (
-        <Dialog open={isFormDialogOpen} onClose={handleCloseDialog} classes={{ paper: classes.dialog }}>
+        <Dialog open={isFormDialogOpen} classes={{ paper: classes.dialog }}>
             <DialogTitle>{buttonText + " " + formType} </DialogTitle>
             <form onSubmit={formSubmit}>
                 <DialogContent>

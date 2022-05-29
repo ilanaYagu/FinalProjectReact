@@ -7,6 +7,7 @@ interface TasksTableFiltersProps {
     setTasks(newTasks: Task[]): void;
     allData: Task[];
 }
+
 enum StatusFilter {
     Open = "Open",
     InProgress = "In Progress",
@@ -52,7 +53,7 @@ const TasksTableFilters = ({ setTasks, allData }: TasksTableFiltersProps) => {
 
     return (
         <>
-            <Select className={classes.filterSelector} value={filters.statusFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, statusFilter: event.target.value as StatusFilter })}>
+            <Select sx={{ m: "0.2%" }} size="small" className={classes.filterSelector} value={filters.statusFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, statusFilter: event.target.value as StatusFilter })}>
                 {
                     Object.values(StatusFilter).map((value) => {
                         return <MenuItem value={value}>{value}</MenuItem>
@@ -60,7 +61,7 @@ const TasksTableFilters = ({ setTasks, allData }: TasksTableFiltersProps) => {
                 }
             </Select>
 
-            <Select className={classes.filterSelector} value={filters.priorityFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, priorityFilter: event.target.value as PriorityFilter })}>
+            <Select sx={{ m: "0.2%" }} size="small" className={classes.filterSelector} value={filters.priorityFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, priorityFilter: event.target.value as PriorityFilter })}>
                 {
                     Object.values(PriorityFilter).map((value) => {
                         return <MenuItem value={value}>{value}</MenuItem>

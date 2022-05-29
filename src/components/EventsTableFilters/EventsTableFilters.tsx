@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { Event } from '../../classes/Event';
-import { isFutureDate, isToday } from '../../utils/utils';
+import { isFutureDate, isToday } from '../../utils';
 
 enum BeginningTimeEventFilter {
     TodayEvents = "Today Events",
@@ -19,7 +19,7 @@ const EventsTableFilters = ({ setEvents, allData }: EventsTableFiltersProps) => 
 
     useEffect(() => {
         setEvents(filteredEvents());
-    }, [filter, allData, setEvents])
+    }, [filter, allData])
 
     const filteredEvents = (): Event[] => {
         return allData.filter((event: Event) => {
@@ -37,7 +37,7 @@ const EventsTableFilters = ({ setEvents, allData }: EventsTableFiltersProps) => 
     }
 
     return (
-        <Select value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilter)}>
+        <Select sx={{ m: "0.2%" }} size="small" value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilter)}>
             {
                 Object.values(BeginningTimeEventFilter).map((value) => {
                     return <MenuItem value={value}>{value}</MenuItem>

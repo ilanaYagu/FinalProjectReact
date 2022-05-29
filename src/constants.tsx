@@ -1,4 +1,4 @@
-import { Priority, Status } from "../types/tasksTypes";
+import { Priority } from "./types/tasksTypes";
 import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowDownRounded';
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
 import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
@@ -8,10 +8,10 @@ import Brightness1RoundedIcon from '@mui/icons-material/Brightness1Rounded';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import { green, pink } from "@mui/material/colors";
-import { otherColumnProperties, TableHeaders } from "../types/managementtTableTypes";
-import { Task } from "../classes/Task";
-import { Event } from "../classes/Event";
-import { Basic } from "../classes/Basic";
+import { OtherColumnProperties, TableHeaders } from "./types/managementTableTypes";
+import { Task } from "./classes/Task";
+import { Event } from "./classes/Event";
+import { Basic } from "./classes/Basic";
 
 export const columnsForTasksTable: TableHeaders<Task> = {
     type: "Type",
@@ -23,7 +23,7 @@ export const columnsForTasksTable: TableHeaders<Task> = {
     actions: "Actions"
 };
 
-export const otherColumnForTasksTable: otherColumnProperties<Task> = {
+export const otherColumnForTasksTable: OtherColumnProperties<Task> = {
     untilDate: "Until Date",
     timeSpent: "Time Spent"
 };
@@ -36,7 +36,7 @@ export const columnsForTodayTasksAndEventsTable: TableHeaders<Task> | TableHeade
     actions: "Actions"
 };
 
-export const otherColumnForTodayTasksAndEventsTable: otherColumnProperties<Task> | otherColumnProperties<Event> = {
+export const otherColumnForTodayTasksAndEventsTable: OtherColumnProperties<Task> | OtherColumnProperties<Event> = {
     status: "Status",
     untilDate: "Until Date",
     beginningTime: "From",
@@ -53,9 +53,6 @@ export const columnsForEventsTable: TableHeaders<Event> = {
     location: "Location",
     actions: "Actions"
 };
-
-export const statusesOptions: Status[] = Object.values(Status);
-export const priorityOptions: Priority[] = Object.values(Priority);
 
 export const customRenderers = {
     type: (it: Basic) => (
@@ -87,8 +84,5 @@ export const customRenderersEvents = {
     )
 }
 
-export enum Type {
-    Task = 'Task',
-    Event = 'Event',
-}
+
 

@@ -1,17 +1,14 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
-import { CustomRenderers, ExternalHeaders, otherColumnProperties, TableHeaders } from "../../types/managementtTableTypes";
+import { CustomRenderers, ExternalHeaders, OtherColumnProperties, TableHeaders } from "../../types/managementTableTypes";
 import { Basic } from "../../classes/Basic";
 import ItemInTable from "./ItemInTable";
-import { ItemFormContext, ItemFormContextType } from "../../context/itemFormContext";
-import { DeleteItemFormContext, DeleteItemFormContextType } from "../../context/deleteItemFormContext";
 import { makeStyles } from "@mui/styles";
-import { getComparator, JustifySortProperties, sortByEstimatedTime } from "./utils";
+import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./utils";
 
-
-const unSortableHeaders: ExternalHeaders[] = ["other", "actions", "type"];
-export const justifySortProperties: JustifySortProperties[] = [{ property: "estimatedTime" as SortBy, sort: sortByEstimatedTime }];
+const unSortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
+export const customSortProperties: CustomSortProperties[] = [{ property: "estimatedTime" as SortBy, sort: sortByEstimatedTime }];
 export enum SortOrder {
     Asc = "asc",
     Desc = "desc",
@@ -24,14 +21,15 @@ interface ItemsTableProps {
     setItems(newItems: Basic[]): void;
     headers: TableHeaders<Basic>;
     customRenderers?: CustomRenderers<Basic>;
-    otherColumn?: otherColumnProperties<Basic>;
+    otherColumn?: OtherColumnProperties<Basic>;
     search: string;
     searchableProperties: (keyof Basic)[];
 }
 
 const useStyles = makeStyles({
     pagination: {
-        overflow: "inherit !important"
+        overflow: "inherit !important",
+        marginTop: "30%"
     },
     header: {
         fontWeight: "bold !important",
@@ -46,8 +44,6 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, se
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortBy, setSortBy] = useState<SortBy>("");
     const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.Nothing);
-    const { handleOpenUpdateForm } = useContext<ItemFormContextType>(ItemFormContext);
-    const { handleOpenDeleteDialog } = useContext<DeleteItemFormContextType>(DeleteItemFormContext);
 
     const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
         setPage(newPage);
@@ -100,7 +96,7 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, se
     }
 
     const renderRowInTableBody = (item: Basic, index: number) => {
-        return <ItemInTable item={item} index={index} headers={headers} customRenderers={customRenderers} otherColumn={otherColumn} deleteItem={handleOpenDeleteDialog} editItem={handleOpenUpdateForm} />
+        return <ItemInTable item={item} index={index} headers={headers} customRenderers={customRenderers} otherColumn={otherColumn} />
     }
 
     const handleDragEnd = (result: DropResult) => {

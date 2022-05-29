@@ -3,7 +3,7 @@ import { Color, ColorPicker } from "material-ui-color";
 import InvitedGuestsField from "./InvitedGuestsField";
 import { getDateTextField } from "./utils";
 import { makeStyles } from "@mui/styles";
-import { EventInputs } from "./types";
+import { EventInputs } from "./ItemForm";
 
 interface EventFormProps {
     eventInputs: EventInputs;

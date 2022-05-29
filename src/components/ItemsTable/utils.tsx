@@ -1,26 +1,9 @@
 import { Basic } from "../../classes/Basic";
-import { justifySortProperties, SortBy, SortOrder } from "./ItemsTable";
+import { customSortProperties, SortBy, SortOrder } from "./ItemsTable";
 
-export type JustifySortProperties = {
+export type CustomSortProperties = {
     property: SortBy;
     sort: (a: Basic, b: Basic, orderBy: SortBy) => number;
-}
-
-const descendingComparator = (a: Basic, b: Basic, orderBy: SortBy): number => {
-    if (justifySortProperties.filter(e => e.property === orderBy).length > 0) {
-        return doJustifySort(a, b, orderBy)
-    }
-    return compare(a[orderBy as keyof Basic], b[orderBy as keyof Basic])
-}
-
-const doJustifySort = (a: Basic, b: Basic, orderBy: SortBy): number => {
-    let comparationResult: number = 0;
-    justifySortProperties.forEach(property => {
-        if (property.property === orderBy) {
-            comparationResult = property.sort(a, b, orderBy);
-        }
-    });
-    return comparationResult;
 }
 
 export function getComparator(order: SortOrder, orderBy: SortBy): (a: Basic, b: Basic) => number {
@@ -32,10 +15,27 @@ export const sortByEstimatedTime = (a: Basic, b: Basic, orderBy: SortBy): number
     let dateA = new Date();
     dateA.setDate(new Date().getDate() + (a[orderBy as keyof Basic]?.includes("d") ? numA : numA * 7));
 
-    let dateB = new Date();
     const numB = parseInt(b[orderBy as keyof Basic]?.replace(/^\D+/g, ''));
+    let dateB = new Date();
     dateB.setDate(new Date().getDate() + (b[orderBy as keyof Basic]?.includes("d") ? numB : numB * 7))
     return compare(dateA, dateB);
+}
+
+const descendingComparator = (a: Basic, b: Basic, orderBy: SortBy): number => {
+    if (customSortProperties.filter(e => e.property === orderBy).length > 0) {
+        return doCustomSort(a, b, orderBy)
+    }
+    return compare(a[orderBy as keyof Basic], b[orderBy as keyof Basic])
+}
+
+const doCustomSort = (a: Basic, b: Basic, orderBy: SortBy): number => {
+    let comparationResult: number = 0;
+    customSortProperties.forEach(property => {
+        if (property.property === orderBy) {
+            comparationResult = property.sort(a, b, orderBy);
+        }
+    });
+    return comparationResult;
 }
 
 const compare = <T,>(a: T, b: T) => {
