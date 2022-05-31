@@ -1,15 +1,15 @@
-import { Priority, Status } from "../types/tasksTypes";
-import { Basic } from "./Basic";
+import { PriorityType, StatusType } from "../types/tasksTypes";
+import { BasicItem } from "./BasicItem";
 
-export class Task extends Basic {
+export class Task extends BasicItem {
   estimatedTime: string;
-  status: Status;
-  priority: Priority;
+  status: StatusType;
+  priority: PriorityType;
   review: string;
   timeSpent: string;
   untilDate: string;
 
-  constructor(id: string, title: string, description: string, estimatedTime: string, status: Status, priority: Priority, review: string, timeSpent: string, untilDate: string) {
+  constructor(id: string, title: string, description: string, estimatedTime: string, status: StatusType, priority: PriorityType, review: string, timeSpent: string, untilDate: string) {
     super(id, title, description);
     this.estimatedTime = estimatedTime || "";
     this.status = status || "Open";

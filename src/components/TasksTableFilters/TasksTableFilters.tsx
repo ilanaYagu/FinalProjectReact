@@ -1,21 +1,20 @@
 import { useEffect, useState } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { Task } from '../../classes/Task';
-import { makeStyles } from '@mui/styles';
 
 interface TasksTableFiltersProps {
     setTasks(newTasks: Task[]): void;
-    allData: Task[];
+    data: Task[];
 }
 
-enum StatusFilter {
+enum StatusFilterType {
     Open = "Open",
     InProgress = "In Progress",
     Done = "Done",
     All = "All Statuses"
 }
 
-enum PriorityFilter {
+enum PriorityFilterType {
     Top = "Top",
     Regular = "Regular",
     Low = "Low",
@@ -23,47 +22,40 @@ enum PriorityFilter {
 }
 
 interface TasksFilters {
-    statusFilter: StatusFilter,
-    priorityFilter: PriorityFilter
+    statusFilter: StatusFilterType,
+    priorityFilter: PriorityFilterType
 }
 
-const useStyles = makeStyles({
-    filterSelector: {
-        marginRight: "0.5%"
-    }
-});
-
-const TasksTableFilters = ({ setTasks, allData }: TasksTableFiltersProps) => {
-    const classes = useStyles();
+const TasksTableFilters = ({ setTasks, data }: TasksTableFiltersProps) => {
     const [filters, setFilters] = useState<TasksFilters>({
-        statusFilter: StatusFilter.All,
-        priorityFilter: PriorityFilter.All,
+        statusFilter: StatusFilterType.All,
+        priorityFilter: PriorityFilterType.All,
     });
 
     useEffect(() => {
         setTasks(filteredTasks());
-    }, [filters, allData])
+    }, [filters, data])
 
     const filteredTasks = (): Task[] => {
-        return allData.filter((task: Task) => {
-            return (filters.priorityFilter === PriorityFilter.All || task.priority as string === filters.priorityFilter)
-                && (filters.statusFilter === StatusFilter.All || task.status as string === filters.statusFilter)
+        return data.filter((task: Task) => {
+            return (filters.priorityFilter === PriorityFilterType.All || task.priority as string === filters.priorityFilter)
+                && (filters.statusFilter === StatusFilterType.All || task.status as string === filters.statusFilter)
         })
     }
 
     return (
         <>
-            <Select sx={{ m: "0.2%" }} size="small" className={classes.filterSelector} value={filters.statusFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, statusFilter: event.target.value as StatusFilter })}>
+            <Select sx={{ m: "0.2%" }} size="small" value={filters.statusFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, statusFilter: event.target.value as StatusFilterType })}>
                 {
-                    Object.values(StatusFilter).map((value) => {
+                    Object.values(StatusFilterType).map((value) => {
                         return <MenuItem value={value}>{value}</MenuItem>
                     })
                 }
             </Select>
 
-            <Select sx={{ m: "0.2%" }} size="small" className={classes.filterSelector} value={filters.priorityFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, priorityFilter: event.target.value as PriorityFilter })}>
+            <Select sx={{ m: "0.2%" }} size="small" value={filters.priorityFilter} onChange={(event: SelectChangeEvent<string>) => setFilters({ ...filters, priorityFilter: event.target.value as PriorityFilterType })}>
                 {
-                    Object.values(PriorityFilter).map((value) => {
+                    Object.values(PriorityFilterType).map((value) => {
                         return <MenuItem value={value}>{value}</MenuItem>
                     })
                 }

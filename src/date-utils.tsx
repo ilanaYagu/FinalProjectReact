@@ -1,4 +1,4 @@
-import { Basic } from "./classes/Basic";
+import { BasicItem } from "./classes/BasicItem";
 import { Event } from "./classes/Event";
 import { Task } from "./classes/Task";
 
@@ -14,8 +14,8 @@ export const isToday = (date: Date) => {
         date.getFullYear() == today.getFullYear();
 }
 
-export const filterTodayItems = (items: Basic[]): Basic[] => {
-    return items.filter((item: Basic) => {
+export const filterTodayItems = (items: BasicItem[]): BasicItem[] =>
+    items.filter((item: BasicItem) => {
         if (item instanceof Event) {
             return isToday(new Date(item.beginningTime))
         } else if (item instanceof Task) {
@@ -23,4 +23,3 @@ export const filterTodayItems = (items: Basic[]): Basic[] => {
         }
         return false;
     });
-}

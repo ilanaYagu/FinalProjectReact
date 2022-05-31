@@ -8,7 +8,7 @@ export type TableHeaders<T> = Partial<Record<keyof T, string>> | Record<External
 
 export type ExternalHeaders = "type" | "actions" | "other" | "color";
 
-export enum Type {
+export enum ItemType {
     Task = 'Task',
     Event = 'Event',
 }

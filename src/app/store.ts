@@ -1,15 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import tasksReducer from "../feature/tasksSlice";
 import eventsReducer from "../feature/eventsSlice";
-import deleteItemFormReducer from "../feature/deleteItemFormSlice";
-import itemFormReducer from "../feature/itemFormSlice";
 
 export const store = configureStore({
     reducer: {
         tasks: tasksReducer,
-        events: eventsReducer,
-        deleteItemForm: deleteItemFormReducer,
-        itemForm: itemFormReducer
+        events: eventsReducer
     },
     middleware: getDefaultMiddleware => getDefaultMiddleware({
         serializableCheck: false

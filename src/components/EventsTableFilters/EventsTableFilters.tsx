@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { Event } from '../../classes/Event';
-import { isFutureDate, isToday } from '../../utils';
+import { isFutureDate, isToday } from '../../date-utils';
 
-enum BeginningTimeEventFilter {
+enum BeginningTimeEventFilterType {
     TodayEvents = "Today Events",
     FutureEvents = "Future Events",
     AllEvents = "All Events"
@@ -11,35 +11,34 @@ enum BeginningTimeEventFilter {
 
 interface EventsTableFiltersProps {
     setEvents(events: Event[]): void;
-    allData: Event[];
+    data: Event[];
 }
 
-const EventsTableFilters = ({ setEvents, allData }: EventsTableFiltersProps) => {
-    const [filter, setFilter] = useState<BeginningTimeEventFilter>(BeginningTimeEventFilter.AllEvents);
+const EventsTableFilters = ({ setEvents, data }: EventsTableFiltersProps) => {
+    const [filter, setFilter] = useState<BeginningTimeEventFilterType>(BeginningTimeEventFilterType.AllEvents);
 
     useEffect(() => {
         setEvents(filteredEvents());
-    }, [filter, allData])
+    }, [filter, data])
 
-    const filteredEvents = (): Event[] => {
-        return allData.filter((event: Event) => {
+    const filteredEvents = (): Event[] =>
+        data.filter((event: Event) => {
             const eventDate = new Date(event.beginningTime);
-            if (filter === BeginningTimeEventFilter.AllEvents) {
+            if (filter === BeginningTimeEventFilterType.AllEvents) {
                 return true;
             }
-            else if (filter === BeginningTimeEventFilter.TodayEvents) {
+            else if (filter === BeginningTimeEventFilterType.TodayEvents) {
                 return isToday(eventDate);
             }
             else {
                 return isFutureDate(eventDate)
             }
         })
-    }
 
     return (
-        <Select sx={{ m: "0.2%" }} size="small" value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilter)}>
+        <Select sx={{ m: "0.2%" }} size="small" value={filter} onChange={(event: SelectChangeEvent<string>) => setFilter(event.target.value as BeginningTimeEventFilterType)}>
             {
-                Object.values(BeginningTimeEventFilter).map((value) => {
+                Object.values(BeginningTimeEventFilterType).map((value) => {
                     return <MenuItem value={value}>{value}</MenuItem>
                 })
             }

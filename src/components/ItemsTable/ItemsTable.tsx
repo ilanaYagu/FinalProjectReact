@@ -1,75 +1,57 @@
 import React, { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
-import { CustomRenderers, ExternalHeaders, OtherColumnProperties, TableHeaders } from "../../types/managementTableTypes";
-import { Basic } from "../../classes/Basic";
-import ItemInTable from "./ItemInTable";
-import { makeStyles } from "@mui/styles";
-import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./utils";
+import { ExternalHeaders, TableHeaders } from "../../types/managementTableTypes";
+import { BasicItem } from "../../classes/BasicItem";
+import TableItem from "./TableItem";
+import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./items-table-utils";
 
-const unSortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
-export const customSortProperties: CustomSortProperties[] = [{ property: "estimatedTime" as SortBy, sort: sortByEstimatedTime }];
-export enum SortOrder {
+const unsortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
+export const customSortProperties: CustomSortProperties[] = [{ sortFiled: "estimatedTime" as SortField, sort: sortByEstimatedTime }];
+export enum SortOrderType {
     Asc = "asc",
     Desc = "desc",
     Nothing = ""
 }
-export type SortBy = keyof TableHeaders<Basic> | "";
+export type SortField = keyof TableHeaders<BasicItem> | "";
 
 interface ItemsTableProps {
-    items: Basic[];
-    setItems(newItems: Basic[]): void;
-    headers: TableHeaders<Basic>;
-    customRenderers?: CustomRenderers<Basic>;
-    otherColumn?: OtherColumnProperties<Basic>;
+    items: BasicItem[];
+    setItems(newItems: BasicItem[]): void;
+    headers: TableHeaders<BasicItem>;
     search: string;
-    searchableProperties: (keyof Basic)[];
+    searchableProperties: (keyof BasicItem)[];
+    handleEditItem: (itemToUpdate: BasicItem) => void;
+    handleDeleteItem: (itemToDelete: BasicItem) => void;
 }
 
-const useStyles = makeStyles({
-    pagination: {
-        overflow: "inherit !important",
-        marginTop: "30%"
-    },
-    header: {
-        fontWeight: "bold !important",
-        fontSize: "18px !important",
-        whiteSpace: "nowrap",
-    }
-});
-
-const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, search, searchableProperties }: ItemsTableProps) => {
-    const classes = useStyles();
+const ItemsTable = ({ items, setItems, headers, search, searchableProperties, handleEditItem, handleDeleteItem }: ItemsTableProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [sortBy, setSortBy] = useState<SortBy>("");
-    const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.Nothing);
-
-    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) => {
-        setPage(newPage);
-    };
+    const [sortBy, setSortBy] = useState<SortField>("");
+    const [sortOrder, setSortOrder] = useState<SortOrderType>(SortOrderType.Nothing);
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        setRowsPerPage(parseInt(event.target.value));
         setPage(0);
     };
 
-    const handleRequestSort = (property: SortBy) => {
-        const isAsc = sortBy === property && sortOrder === 'asc';
-        setSortOrder(isAsc ? SortOrder.Desc : SortOrder.Asc);
+    const handleSort = (property: SortField) => {
+        const isAsc = sortBy === property && sortOrder === SortOrderType.Asc;
+        setSortOrder(isAsc ? SortOrderType.Desc : SortOrderType.Asc);
         setSortBy(property);
     }
 
-    const renderHeader = () => {
-        return <TableHead>
+    const getHeader = () =>
+        <TableHead>
             <TableRow>
                 {Object.entries(headers).map(([key, header]) => {
-                    return <TableCell className={classes.header} align="center">
+                    return <TableCell sx={{ fontWeight: "bold", fontSize: "18px", whiteSpace: "nowrap" }} align="center">
                         {
-                            unSortableHeaders.includes(key as ExternalHeaders) ?
+                            unsortableHeaders.includes(key as ExternalHeaders) ?
                                 header
                                 :
-                                <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrder.Nothing ? undefined : sortOrder} onClick={() => handleRequestSort(key as SortBy)}>
+                                <TableSortLabel active={sortBy === key} direction={sortOrder === SortOrderType.Nothing ? undefined : sortOrder} onClick={() => handleSort(key as SortField)}>
                                     {header}
                                 </TableSortLabel>
                         }
@@ -77,27 +59,23 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, se
                 })}
             </TableRow>
         </TableHead>
-    }
 
-    const renderBody = () => {
-        return <DragDropContext onDragEnd={handleDragEnd}>
+    const getBody = () =>
+        <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="items" direction="vertical" >
                 {(droppableProvided: DroppableProvided) => (
                     <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                         {
-                            items.filter((item) => {
-                                return isMatchedWithSearchFilter(item);
-                            }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).sort(getComparator(sortOrder, sortBy)).map(renderRowInTableBody)
+                            items.filter(isMatchedWithSearchFilter).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .sort(getComparator(sortOrder, sortBy)).map(getRow)
                         }
                     </TableBody>
                 )}
             </Droppable>
         </DragDropContext>
-    }
 
-    const renderRowInTableBody = (item: Basic, index: number) => {
-        return <ItemInTable item={item} index={index} headers={headers} customRenderers={customRenderers} otherColumn={otherColumn} />
-    }
+    const getRow = (item: BasicItem, index: number) =>
+        <TableItem item={item} index={index} headers={headers} handleEditItem={handleEditItem} handleDeleteItem={handleDeleteItem} />
 
     const handleDragEnd = (result: DropResult) => {
         if (!result.destination || result.destination.index === result.source.index) {
@@ -110,10 +88,10 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, se
         setItems(temp);
     };
 
-    const isMatchedWithSearchFilter = (itm: Basic) => {
+    const isMatchedWithSearchFilter = (item: BasicItem) => {
         let isMatched = false;
-        searchableProperties.forEach((k: keyof Basic) => {
-            const valueToCheck: string = itm[k] as unknown as string;
+        searchableProperties.forEach((property: keyof BasicItem) => {
+            const valueToCheck: string = item[property] as string;
             isMatched = isMatched || valueToCheck.toLowerCase().includes(search.toLowerCase());
         });
         return isMatched;
@@ -121,10 +99,10 @@ const ItemsTable = ({ items, setItems, headers, customRenderers, otherColumn, se
 
     return (
         <Table>
-            {renderHeader()}
-            {renderBody()}
-            <TablePagination className={classes.pagination} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
-                rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
+            {getHeader()}
+            {getBody()}
+            <TablePagination sx={{ overflow: "inherit", marginTop: "30%" }} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
+                rowsPerPage={rowsPerPage} page={page} onPageChange={(event, newPage: number) => setPage(newPage)} onRowsPerPageChange={handleChangeRowsPerPage} />
         </Table>
     );
 }

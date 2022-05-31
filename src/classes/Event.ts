@@ -1,7 +1,7 @@
-import { Color, ColorValue } from "mui-color";
-import { Basic } from "./Basic";
+import { Color } from "mui-color";
+import { BasicItem } from "./BasicItem";
 
-export class Event extends Basic {
+export class Event extends BasicItem {
     beginningTime: string;
     endingTime: string;
     color: Color;

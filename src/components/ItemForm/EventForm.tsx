@@ -1,9 +1,9 @@
 import { TextField } from "@mui/material";
 import { Color, ColorPicker } from "material-ui-color";
 import InvitedGuestsField from "./InvitedGuestsField";
-import { getDateTextField } from "./utils";
 import { makeStyles } from "@mui/styles";
 import { EventInputs } from "./ItemForm";
+import DateTextField from "./DateTextField";
 
 interface EventFormProps {
     eventInputs: EventInputs;
@@ -26,10 +26,10 @@ function EventForm({ eventInputs, setEventInputs, classField }: EventFormProps) 
     const classes = useStyles();
 
     return <>
-        {getDateTextField(classField, "Beginning Date", "beginningTime", eventInputs, setEventInputs)}
-        {getDateTextField(classField, "Ending Time", "endingTime", eventInputs, setEventInputs)}
-        {getDateTextField(classField, "Notification Time", "notificationTime", eventInputs, setEventInputs)}
-        <TextField className={classField} label="Location" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEventInputs({ ...eventInputs, location: event.target.value })} defaultValue={eventInputs.location} />
+        <DateTextField label="Beginning Date" field="beginningTime" inputs={eventInputs} setInputs={setEventInputs} />
+        <DateTextField label="Ending Time" field="endingTime" inputs={eventInputs} setInputs={setEventInputs} />
+        <DateTextField label="Notification Time" field="notificationTime" inputs={eventInputs} setInputs={setEventInputs} />
+        <TextField margin="normal" className={classField} label="Location" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEventInputs({ ...eventInputs, location: event.target.value })} defaultValue={eventInputs.location} />
         <div className={classes.colorPicker}>
             <div className={classes.colorPickerTitle}>Color:</div> <ColorPicker hideTextfield value={eventInputs.color} onChange={(newColor: Color) => setEventInputs({ ...eventInputs, color: newColor })} />
         </div>

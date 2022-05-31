@@ -1,11 +1,11 @@
 
-export enum Priority {
+export enum PriorityType {
     Low = "Low",
     Regular = "Regular",
     Top = "Top"
 }
 
-export enum Status {
+export enum StatusType {
     Open = "Open",
     InProgress = "In Progress",
     Done = "Done"

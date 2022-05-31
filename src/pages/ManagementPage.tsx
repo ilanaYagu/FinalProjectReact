@@ -8,24 +8,16 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import ItemForm from "../components/ItemForm/ItemForm";
 import ItemsTable from "../components/ItemsTable/ItemsTable";
-import { customRenderers, customRenderersEvents } from "../constants";
 import DeleteForm from "../components/DeleteForm/DeleteForm";
-import { OtherColumnProperties, TableHeaders, Type } from "../types/managementTableTypes";
+import { TableHeaders, ItemType } from "../types/managementTableTypes";
 import { makeStyles } from "@mui/styles";
 import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
-import { Basic } from "../classes/Basic";
+import { BasicItem } from "../classes/BasicItem";
 import SearchField from "../components/SearchField/SearchField";
-import { useDispatch, useSelector } from "react-redux";
-import { handleOpenCreateForm } from "../feature/itemFormSlice";
-import { AppDispatch, RootState } from "../app/store";
 
-const searchableProperties: (keyof Basic)[] = ["title"];
+const searchableProperties: (keyof BasicItem)[] = ["title"];
 const useStyles = makeStyles({
-    addButton: {
-        fontWeight: 'bold !important',
-        margin: '1% !important',
-    },
     filtersTitle: {
         marginTop: "0.7%",
         marginRight: "0.5%"
@@ -39,76 +31,87 @@ const useStyles = makeStyles({
     }
 });
 
-
 interface ManagementPageProps {
-    type?: Type;
-    allDataTable: Basic[];
-    todayEvents?: Basic[];
-    todayTasks?: Basic[];
-    headersOfTable: TableHeaders<Task> | TableHeaders<Event>;
-    otherColumnOfTable?: OtherColumnProperties<Task> | OtherColumnProperties<Event>;
+    type?: ItemType;
+    data: { tasks: Task[], events: Event[] };
+    headers: TableHeaders<Task> | TableHeaders<Event>;
 }
 
-const ManagementPage = ({ type, allDataTable, todayEvents, todayTasks, headersOfTable, otherColumnOfTable }: ManagementPageProps) => {
+const ManagementPage = ({ type, data, headers }: ManagementPageProps) => {
     const classes = useStyles();
-    const [dataTableToShow, setDataTableToShow] = useState<Basic[]>(allDataTable);
+    const [filteredData, setFilteredData] = useState<BasicItem[]>([...data.tasks, ...data.events]);
     const [search, setSearch] = useState<string>("");
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+    const [itemToDelete, setItemToDelete] = useState<BasicItem | "">("");
+    const [isFormDialogOpen, setIsFormDialogOpen] = useState<boolean>(false);
+    const [itemToUpdate, setItemToUpdate] = useState<BasicItem | "">("");
 
-    const { isDeleteDialogOpen, itemToDelete } = useSelector(
-        (state: RootState) => state.deleteItemForm
-    );
-    const { isFormDialogOpen, itemToUpdate } = useSelector(
-        (state: RootState) => state.itemForm
-    );
+    const handleCloseItemForm = (): void => {
+        setItemToUpdate("");
+        setIsFormDialogOpen(false);
+    }
 
-    const dispatch = useDispatch<AppDispatch>();
+    const handleOpenCreateForm = (): void => {
+        setIsFormDialogOpen(true);
+    }
 
-    const renderFilters = () => {
-        return <Box display="flex" className={classes.filterBox}>
+    const handleOpenUpdateForm = (itemToUpdate: BasicItem): void => {
+        setItemToUpdate(itemToUpdate);
+        setIsFormDialogOpen(true);
+    }
+
+    const handleOpenDeleteDialog = (itemToDelete: BasicItem): void => {
+        setIsDeleteDialogOpen(true);
+        setItemToDelete(itemToDelete);
+    }
+    const handleCloseDeleteDialog = (): void => {
+        setIsDeleteDialogOpen(false);
+        setItemToDelete("");
+    }
+
+    const getFilters = () =>
+        <Box display="flex" className={classes.filterBox}>
             <div className={classes.filtersTitle}>Quick Filters:</div>
             {
                 !type ?
-                    <DashboardTableToggleFilters setDataTable={setDataTableToShow} allData={allDataTable} />
+                    <DashboardTableToggleFilters setDataTable={setFilteredData} data={data} />
                     :
-                    type === Type.Task ?
-                        <TasksTableFilters setTasks={(tasks: Task[]) => setDataTableToShow(tasks)} allData={allDataTable as Task[]} />
+                    type === ItemType.Task ?
+                        <TasksTableFilters setTasks={(tasks: Task[]) => setFilteredData(tasks)} data={data.tasks} />
                         :
-                        <EventsTableFilters setEvents={(events: Event[]) => setDataTableToShow(events)} allData={allDataTable as Event[]} />
+                        <EventsTableFilters setEvents={(events: Event[]) => setFilteredData(events)} data={data.events} />
             }
         </Box>
-    }
 
-    const renderSubTitle = () => {
-        return (type ?
-            <h4>Total {type}s: {allDataTable.length}</h4>
+    const getSubtitle = () =>
+        type ?
+            <h4>Total {type}s: {[...data.tasks, ...data.events].length}</h4>
             :
-            <h4>Total Tasks: {todayTasks?.length}, Total Events: {todayEvents?.length}</h4>
-        )
-    }
+            <h4>Total Tasks: {data.tasks.length}, Total Events: {data.events.length}</h4>
 
     return (
         <Box>
-            <h1>{type ? type + "s" : "Events and Tasks For Today"} Management</h1>
+            <h1>{type ? `${type}s` : "Today"} Management</h1>
             <SearchField setSearch={setSearch} />
-            <Button variant="contained" className={classes.addButton} onClick={() => dispatch(handleOpenCreateForm())} startIcon={type === Type.Event ? <CalendarMonthRoundedIcon /> : <AddTaskIcon />}>
+            <Button variant="contained" sx={{ fontWeight: 'bold', m: '1%' }} onClick={handleOpenCreateForm} startIcon={type === ItemType.Event ? <CalendarMonthRoundedIcon /> : <AddTaskIcon />}>
                 Add {type}
             </Button>
-            {renderFilters()}
-            {renderSubTitle()}
+            {getFilters()}
+            {getSubtitle()}
+
             {isFormDialogOpen &&
-                <ItemForm type={type ? type : (itemToUpdate ? (itemToUpdate instanceof Task ? Type.Task : Type.Event) : Type.Task)} enableSwitchType={type ? false : true} />}
+                <ItemForm type={type ? type : (itemToUpdate ? (itemToUpdate instanceof Task ? ItemType.Task : ItemType.Event) : ItemType.Task)} enableSwitchType={type ? false : true} open={isFormDialogOpen} handleClose={handleCloseItemForm} itemToUpdate={itemToUpdate ? itemToUpdate : undefined} />}
             {
-                dataTableToShow.length > 0 ?
-                    <ItemsTable headers={headersOfTable} otherColumn={otherColumnOfTable} items={dataTableToShow}
-                        setItems={(newItems: Task[]) => setDataTableToShow(newItems)}
-                        customRenderers={type === Type.Event ? customRenderersEvents : customRenderers}
+                filteredData.length > 0 ?
+                    <ItemsTable headers={headers} items={filteredData} setItems={(newItems: Task[]) => setFilteredData(newItems)}
+                        handleEditItem={handleOpenUpdateForm} handleDeleteItem={handleOpenDeleteDialog}
                         search={search} searchableProperties={searchableProperties} />
                     :
                     <h1 className={classes.noItems}>NO ITEMS</h1>
             }
 
             {isDeleteDialogOpen && itemToDelete != "" &&
-                <DeleteForm item={itemToDelete} />}
+                <DeleteForm item={itemToDelete} open={isDeleteDialogOpen} handleClose={handleCloseDeleteDialog} />}
         </Box>
     );
 };

@@ -1,4 +1,4 @@
-export class Basic {
+export class BasicItem {
     id: string;
     title: string;
     description: string;

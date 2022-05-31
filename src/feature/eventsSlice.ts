@@ -32,26 +32,23 @@ const eventsSlice = createSlice({
     reducers: {
         addEvent: (state, action: PayloadAction<Event>): void => {
             const newEvent = action.payload;
-            const event = new Event(newEvent.id, newEvent.title, newEvent.description,
-                newEvent.beginningTime, newEvent.endingTime, newEvent.color, newEvent.location, newEvent.notificationTime, newEvent.invitedGuests);
-            state.events.push(event);
+            state.events.push(new Event(newEvent.id, newEvent.title, newEvent.description,
+                newEvent.beginningTime, newEvent.endingTime, newEvent.color, newEvent.location, newEvent.notificationTime, newEvent.invitedGuests));
         },
         updateEvent: (state, action: PayloadAction<Event>): void => {
             const eventToUpdate = action.payload;
-            const tempEvents = state.events.map((event) => {
+            state.events = state.events.map((event) => {
                 if (event.id === eventToUpdate.id) {
                     return new Event(eventToUpdate.id, eventToUpdate.title, eventToUpdate.description,
                         eventToUpdate.beginningTime, eventToUpdate.endingTime, eventToUpdate.color, eventToUpdate.location, eventToUpdate.notificationTime, eventToUpdate.invitedGuests);
                 }
                 return event;
-            });
-            state.events = tempEvents;
+            });;
         },
         deleteEvent: (state, action: PayloadAction<string>): void => {
-            const newEventsArr: Event[] = state.events.filter((event) => {
+            state.events = state.events.filter((event) => {
                 return event.id !== action.payload;
-            });
-            state.events = newEventsArr;
+            });;
         }
     }
 })

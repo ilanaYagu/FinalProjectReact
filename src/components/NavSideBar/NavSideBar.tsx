@@ -38,7 +38,7 @@ export const NavSideBar = () => {
             <Box className={classes.logo}>
                 <h1>Purple Calendar</h1>
                 <Container>
-                    <img src={earth} height="80%" width="50%" alt="Manage Your Life" loading="lazy" />
+                    <img src={earth} height="80%" width="50%" alt="Manage Your Life" />
                 </Container>
             </Box>
             <Box className={classes.navBarBox}>

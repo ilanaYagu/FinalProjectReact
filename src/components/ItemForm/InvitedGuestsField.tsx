@@ -25,11 +25,13 @@ const InvitedGuestsField = ({ invitedGuests, setInvitedGuests }: InvitedGuestsFi
 
     return (
         <div>
-            {invitedGuests?.map((name: string) => (
+            {invitedGuests?.map((name: string, index: number) => (
                 <Chip label={name} variant="outlined"
-                    onDelete={() =>
-                        setInvitedGuests(invitedGuests.filter((chip) => chip !== name))
-                    }
+                    onDelete={() => {
+                        const newInvitedGuests = [...invitedGuests]
+                        newInvitedGuests.splice(index, 1);
+                        setInvitedGuests(newInvitedGuests);
+                    }}
                 />
             ))}
             <TextField placeholder="new guest" variant="standard" value={newGuest} onKeyDown={handleKeyDown}
