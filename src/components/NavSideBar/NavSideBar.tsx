@@ -1,7 +1,5 @@
-import Drawer from "@mui/material/Drawer";
-import ListItem from "@mui/material/ListItem";
-import List from "@mui/material/List";
-import { menu } from './NavBarData'
+import { Drawer, ListItem, List } from "@mui/material";
+import { menu } from './NavBarData';
 import { Container, Box, ListItemText } from "@mui/material";
 import earth from '../../assets/earth.png';
 import { NavLink } from "react-router-dom";
@@ -31,7 +29,7 @@ const useStyles = makeStyles({
     }
 });
 
-export const NavSideBar = () => {
+export const NavSidebar = () => {
     const classes = useStyles();
     return (
         <Drawer variant="permanent" classes={{ paper: classes.drawerPaper }}>

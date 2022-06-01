@@ -8,10 +8,10 @@ interface TasksState {
 
 const initialTasksState: TasksState = {
     tasks: [
-        new Task("1", 'Do my final project', 'I need to fix some things.', "3d", StatusType.InProgress, PriorityType.Top, "", "", "2022-05-29 21:00"),
+        new Task("1", 'Do my final project', 'I need to fix some things.', "3d", StatusType.InProgress, PriorityType.Top, "", "", "2022-06-02 21:00"),
         new Task("2", 'Help my mom in the market', 'grab things, take all we need.', "1w", StatusType.Open, PriorityType.Low, "", "", ""),
-        new Task("3983", 'Ask the teacher about the final project', 'The questions is on my notebook in my computer.', "3.5d", StatusType.Done, PriorityType.Top, "The teacher asked to send him the questions to his mail - and he answered the questions already!", "10d", "2022-05-12 19:00"),
-        new Task("3432", 'Feed my cat', 'First I need to buy the food.', "2d", StatusType.Open, PriorityType.Regular, "", "", "2022-05-30 08:00")
+        new Task("3983", 'Ask the teacher about the final project', 'The questions is on my notebook in my computer.', "3.5d", StatusType.Done, PriorityType.Top, "The teacher asked to send him the questions to his mail - and he answered the questions already!", "10d", "2022-06-01 19:00"),
+        new Task("3432", 'Feed my cat', 'First I need to buy the food.', "2d", StatusType.Open, PriorityType.Regular, "", "", "2022-06-03 08:00")
     ]
 };
 

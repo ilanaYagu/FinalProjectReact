@@ -11,12 +11,11 @@ import { Event } from '../../classes/Event';
 import TaskForm from './TaskForm';
 import EventForm from './EventForm';
 import validator from "validator";
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../app/store';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../app/store';
 import { ItemType } from '../../types/managementTableTypes';
 
 export type TaskInputs = Omit<Task, "id" | "title" | "description">;
-
 export type EventInputs = Omit<Event, "id" | "title" | "description">;
 
 interface ItemFormProps {

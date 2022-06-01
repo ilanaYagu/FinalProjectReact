@@ -8,12 +8,12 @@ interface EventsState {
 
 const initialEventsState: EventsState = {
     events: [
-        new Event("1", 'Vet - for my dogo', 'The doctor ask me to call him one day before the appointment.', '2022-05-29 12:23', '2022-07-09 13:23', createColor("#C88383"),
+        new Event("1", 'Vet - for my dogo', 'The doctor ask me to call him one day before the appointment.', '2022-06-01 12:23', '2022-07-09 13:23', createColor("#C88383"),
             "Ashkelon, the clinic of Yosof",
             "",
             ["Michal Grinborg", "Ron C.", "Ilanit"]
         ),
-        new Event("2", 'Wedding to my bff!', 'Need to buy a dress, and a gift of course.', '2025-09-12 19:30', '2025-09-13 05:45', createColor("#7EA87E"),
+        new Event("2", 'Wedding to my bff!', 'Need to buy a dress, and a gift of course.', '2022-06-01 19:30', '2025-09-13 05:45', createColor("#7EA87E"),
             "Paris",
             "",
             ["Shai", "Ronit", "Hen Levis", "Sholamit"]

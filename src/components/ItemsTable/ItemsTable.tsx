@@ -7,7 +7,7 @@ import TableItem from "./TableItem";
 import { getComparator, CustomSortProperties, sortByEstimatedTime } from "./items-table-utils";
 
 const unsortableHeaders: ExternalHeaders[] = ["other", "actions", "type", "color"];
-export const customSortProperties: CustomSortProperties[] = [{ sortFiled: "estimatedTime" as SortField, sort: sortByEstimatedTime }];
+export const customSortProperties: CustomSortProperties[] = [{ sortField: "estimatedTime" as SortField, sort: sortByEstimatedTime }];
 export enum SortOrderType {
     Asc = "asc",
     Desc = "desc",

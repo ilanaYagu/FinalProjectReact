@@ -1,5 +1,5 @@
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
-import { NavSideBar } from './components/NavSideBar/NavSideBar';
+import { NavSidebar } from './components/NavSidebar/NavSidebar';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from '@mui/material';
 import { blueGrey, grey } from '@mui/material/colors';
@@ -50,7 +50,7 @@ const App = () => {
           <Route path="/dashboard" element={<ManagementPage data={{ tasks: filterTodayItems(tasks) as Task[], events: filterTodayItems(events) as Event[] }} headers={columnsForTodayTasksAndEventsTable} />} />
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
-        <NavSideBar />
+        <NavSidebar />
       </Router>
     </ThemeProvider>
   )

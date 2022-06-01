@@ -14,7 +14,7 @@ import { PriorityType } from "../../types/tasksTypes";
 import { Event } from "../../classes/Event";
 
 export type CustomSortProperties = {
-    sortFiled: SortField;
+    sortField: SortField;
     sort: (a: BasicItem, b: BasicItem, orderBy: SortField) => number;
 }
 
@@ -33,7 +33,7 @@ export const sortByEstimatedTime = (a: BasicItem, b: BasicItem, orderBy: SortFie
 }
 
 const descendingComparator = (a: BasicItem, b: BasicItem, orderBy: SortField): number => {
-    if (customSortProperties.filter(property => property.sortFiled === orderBy).length > 0) {
+    if (customSortProperties.filter(property => property.sortField === orderBy).length > 0) {
         return doCustomSort(a, b, orderBy)
     }
     return compare(a[orderBy as keyof BasicItem], b[orderBy as keyof BasicItem])
@@ -42,7 +42,7 @@ const descendingComparator = (a: BasicItem, b: BasicItem, orderBy: SortField): n
 const doCustomSort = (a: BasicItem, b: BasicItem, orderBy: SortField): number => {
     let comparationResult: number = 0;
     customSortProperties.forEach(property => {
-        if (property.sortFiled === orderBy) {
+        if (property.sortField === orderBy) {
             comparationResult = property.sort(a, b, orderBy);
         }
     });
@@ -68,8 +68,6 @@ export const getTypeIcon = (item: BasicItem) =>
                 <AssignmentIcon sx={{ color: green[500] }} />
         :
         <NotificationsActiveIcon />
-
-
 
 export const getPriorityIcon = (item: BasicItem) =>
     item instanceof Task ?

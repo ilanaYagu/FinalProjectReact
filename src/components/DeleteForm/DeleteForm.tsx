@@ -3,8 +3,8 @@ import { deleteTask } from "../../feature/tasksSlice";
 import { deleteEvent } from "../../feature/eventsSlice";
 import { BasicItem } from '../../classes/BasicItem';
 import { Task } from '../../classes/Task';
-import { AppDispatch, RootState } from '../../app/store';
-import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../app/store';
+import { useDispatch } from 'react-redux';
 
 interface DeleteItemFormProps {
     item: BasicItem;
