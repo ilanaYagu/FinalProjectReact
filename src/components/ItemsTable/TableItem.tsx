@@ -10,8 +10,11 @@ import { Event } from '../../classes/Event';
 import { ReactNode } from 'react';
 import { getColorIcon, getPriorityIcon, getTypeIcon } from './items-table-utils';
 
-const customRendersHeaders = [{ headerKey: "type", render: getTypeIcon }, { headerKey: "color", render: getColorIcon }
-    , { headerKey: "priority", render: getPriorityIcon }];
+const customRendersHeaders = new Map<string, (item: BasicItem) => JSX.Element | "">([
+    ["type", getTypeIcon],
+    ["color", getColorIcon],
+    ["priority", getPriorityIcon]
+]);
 
 const otherColumnProperties: OtherColumnProperties<Task> | OtherColumnProperties<Event> = {
     status: "Status",
@@ -50,9 +53,9 @@ const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: T
 
     const getTableCellContent = (headerKey: string): ReactNode => {
         if (headerKey !== "other" && headerKey !== "actions") {
-            const customRenderHeader = customRendersHeaders.find((header) => header.headerKey === headerKey);
-            return customRenderHeader ?
-                customRenderHeader.render(item) :
+            const customRender = customRendersHeaders.get(headerKey);
+            return customRender ?
+                customRender(item) :
                 headerKey in item ?
                     item[headerKey as keyof BasicItem]
                     : ""

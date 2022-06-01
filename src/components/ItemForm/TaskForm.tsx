@@ -31,7 +31,7 @@ function TaskForm({ taskInputs, setTaskInputs, classField }: TaskFormProps) {
         {getAutoComplete("status", statusesOptions, "Status")}
         <TextField margin="normal" className={classField} label="Estimated Time" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTaskInputs({ ...taskInputs, estimatedTime: event.target.value })} defaultValue={taskInputs.estimatedTime} />
         {getAutoComplete("priority", priorityOptions, "Priority")}
-        <DateTextField label="Until Date" field="untilDate" inputs={taskInputs} setInputs={setTaskInputs} />
+        <DateTextField label="Until Date" value={taskInputs.untilDate} setInput={(newUntilDate) => setTaskInputs({ ...taskInputs, untilDate: newUntilDate })} />
         {
             taskInputs.status === StatusType.Done &&
             <>
