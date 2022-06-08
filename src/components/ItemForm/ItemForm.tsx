@@ -4,7 +4,6 @@ import { makeStyles } from "@mui/styles";
 import { PriorityType, StatusType } from '../../types/tasksTypes';
 import { updateTask, addTask } from "../../feature/tasksSlice";
 import { updateEvent, addEvent } from '../../feature/eventsSlice';
-import { createColor } from 'material-ui-color';
 import { BasicItem } from '../../classes/BasicItem';
 import { Task } from '../../classes/Task';
 import { Event } from '../../classes/Event';
@@ -14,9 +13,10 @@ import validator from "validator";
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../app/store';
 import { ItemType } from '../../types/managementTableTypes';
+import { pink } from '@mui/material/colors';
 
-export type TaskInputs = Omit<Task, "id" | "title" | "description">;
-export type EventInputs = Omit<Event, "id" | "title" | "description">;
+export type TaskInputs = Omit<Task, "_id" | "title" | "description">;
+export type EventInputs = Omit<Event, "_id" | "title" | "description">;
 
 interface ItemFormProps {
     type: ItemType;
@@ -45,13 +45,13 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
     const classes = useStyles();
     const dispatch = useDispatch<AppDispatch>();
 
-    let [baseInputs, setBaseInputs] = useState<BasicItem>({ title: "", id: "", description: "" })
+    let [baseInputs, setBaseInputs] = useState<BasicItem>({ title: "", _id: "", description: "" })
     let [taskInputs, setTaskInputs] = useState<TaskInputs>({
         status: StatusType.Open, estimatedTime: "", priority: PriorityType.Low,
         review: " ", timeSpent: "", untilDate: "",
     });
     let [eventInputs, setEventInputs] = useState<EventInputs>({
-        beginningTime: "", endingTime: "", color: createColor("#DFBEBE"), location: "",
+        beginningTime: "", endingTime: "", color: pink[200], location: "",
         notificationTime: "", invitedGuests: []
     })
     let [buttonText, setButtonText] = useState<string>("");
@@ -60,11 +60,12 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
     useEffect(() => {
         if (itemToUpdate) {
             setButtonText("Update");
-            setBaseInputs({ ...baseInputs, id: itemToUpdate.id, title: itemToUpdate.title, description: itemToUpdate.description });
+            setBaseInputs({ ...baseInputs, _id: itemToUpdate._id, title: itemToUpdate.title, description: itemToUpdate.description });
             if (itemToUpdate instanceof Task)
                 setTaskInputs({ ...taskInputs, status: itemToUpdate.status, estimatedTime: itemToUpdate.estimatedTime, priority: itemToUpdate.priority, timeSpent: itemToUpdate.timeSpent, untilDate: itemToUpdate.untilDate, review: itemToUpdate.review })
-            else if (itemToUpdate instanceof Event)
+            else if (itemToUpdate instanceof Event) {
                 setEventInputs({ ...eventInputs, color: itemToUpdate.color, beginningTime: itemToUpdate.beginningTime, endingTime: itemToUpdate.endingTime, location: itemToUpdate.location, notificationTime: itemToUpdate.notificationTime, invitedGuests: itemToUpdate.invitedGuests })
+            }
         } else {
             setButtonText("Create");
         }
@@ -89,7 +90,7 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
 
     const isValidFields = (): boolean => {
         let isValid: boolean = true;
-        if (validator.trim(baseInputs.id) === "" || validator.trim(baseInputs.title) === "" || validator.trim(baseInputs.description) === "") {
+        if (validator.trim(baseInputs.title) === "" || validator.trim(baseInputs.description) === "") {
             alert("Please fill the Required Fields");
         }
         if (formType === ItemType.Event) {
@@ -108,7 +109,6 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
 
     const getBaseDetails = (): JSX.Element =>
         <>
-            <TextField className={classes.formField} margin="normal" label="ID" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setBaseInputs({ ...baseInputs, id: event.target.value })} defaultValue={baseInputs.id} disabled={itemToUpdate ? true : false} required />
             <TextField className={classes.formField} margin="normal" label="Title" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setBaseInputs({ ...baseInputs, title: event.target.value })} defaultValue={baseInputs.title} required />
             Description * : <TextareaAutosize minRows={3} maxRows={5} className={classes.formField} placeholder="Enter desc..." defaultValue={baseInputs.description}
                 onChange={(event: React.FormEvent) => setBaseInputs({ ...baseInputs, description: (event.target as HTMLInputElement).value })} required />
@@ -117,7 +117,7 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
     const getDialogActions = (): JSX.Element =>
         <DialogActions sx={{ justifyContent: "center", mt: "8%" }}>
             <Button onClick={handleClose} color="secondary" variant="outlined"> Cancel </Button>
-            <Button color="primary" type="submit" variant="contained"> {buttonText} </Button>
+            <Button onClick={formSubmit} color="primary" type="submit" variant="contained"> {buttonText} </Button>
         </DialogActions>
 
     const getSwitchType = () =>
@@ -134,22 +134,20 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
         </>
 
     return (
-        <Dialog open={open} classes={{ paper: classes.dialog }}>
+        <Dialog open={open} classes={{ paper: classes.dialog }} scroll="paper">
             <DialogTitle>{buttonText + " " + formType} </DialogTitle>
-            <form onSubmit={formSubmit}>
-                <DialogContent>
-                    <DialogContentText> Details: </DialogContentText>
-                    {getSwitchType()}
-                    {getBaseDetails()}
-                    {
-                        formType === ItemType.Task ?
-                            <TaskForm taskInputs={taskInputs} setTaskInputs={setTaskInputs} classField={classes.formField} />
-                            :
-                            <EventForm eventInputs={eventInputs} setEventInputs={setEventInputs} classField={classes.formField} />
-                    }
-                </DialogContent>
-                {getDialogActions()}
-            </form>
+            <DialogContent>
+                <DialogContentText> Details: </DialogContentText>
+                {getSwitchType()}
+                {getBaseDetails()}
+                {
+                    formType === ItemType.Task ?
+                        <TaskForm taskInputs={taskInputs} setTaskInputs={setTaskInputs} classField={classes.formField} />
+                        :
+                        <EventForm eventInputs={eventInputs} setEventInputs={setEventInputs} classField={classes.formField} />
+                }
+            </DialogContent>
+            {getDialogActions()}
         </Dialog >
     );
 };

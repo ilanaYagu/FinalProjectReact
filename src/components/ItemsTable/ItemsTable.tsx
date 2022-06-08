@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
+import { Box, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from "react-beautiful-dnd";
 import { ExternalHeaders, TableHeaders } from "../../types/managementTableTypes";
 import { BasicItem } from "../../classes/BasicItem";
@@ -92,18 +92,32 @@ const ItemsTable = ({ items, setItems, headers, search, searchableProperties, ha
         let isMatched = false;
         searchableProperties.forEach((property: keyof BasicItem) => {
             const valueToCheck: string = item[property] as string;
-            isMatched = isMatched || valueToCheck.toLowerCase().includes(search.toLowerCase());
+            isMatched = isMatched || valueToCheck?.toLowerCase().includes(search.toLowerCase());
         });
         return isMatched;
     }
 
-    return (
+    const getTable = () =>
         <Table>
             {getHeader()}
             {getBody()}
             <TablePagination sx={{ overflow: "inherit", marginTop: "30%" }} rowsPerPageOptions={[5, 10, 25]} component="div" count={items.length}
                 rowsPerPage={rowsPerPage} page={page} onPageChange={(event, newPage: number) => setPage(newPage)} onRowsPerPageChange={handleChangeRowsPerPage} />
         </Table>
+
+    return (
+        <>
+            {
+                items.length > 0 ?
+                    getTable()
+                    :
+                    <Box sx={{ mt: "10%", textAlign: "center" }}>
+                        <h1>NO ITEMS</h1>
+                    </Box>
+            }
+        </>
+
+
     );
 }
 

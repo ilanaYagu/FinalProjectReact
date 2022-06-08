@@ -81,5 +81,6 @@ export const getPriorityIcon = (item: BasicItem) =>
 
 export const getColorIcon = (item: BasicItem) =>
     item instanceof Event ?
-        <Brightness1RoundedIcon sx={{ color: "#" + item.color.hex }} /> : ""
+        <Brightness1RoundedIcon sx={{ color: `${item.color}` }} /> : ""
+
 

@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Alert, Button } from "@mui/material";
 import { Box } from "@mui/system";
 import { useState } from "react";
 import DashboardTableToggleFilters from "../components/DashboardTableToggleFilters/DashboardTableToggleFilters";
@@ -15,6 +15,7 @@ import { Task } from "../classes/Task";
 import { Event } from "../classes/Event";
 import { BasicItem } from "../classes/BasicItem";
 import SearchField from "../components/SearchField/SearchField";
+import { HttpStatusType } from "../app/store-constants";
 
 const searchableProperties: (keyof BasicItem)[] = ["title"];
 const useStyles = makeStyles({
@@ -24,10 +25,6 @@ const useStyles = makeStyles({
     },
     filterBox: {
         marginTop: "2%"
-    },
-    noItems: {
-        textAlign: "center",
-        margin: "10%",
     }
 });
 
@@ -35,9 +32,10 @@ interface ManagementPageProps {
     type?: ItemType;
     data: { tasks: Task[], events: Event[] };
     headers: TableHeaders<Task> | TableHeaders<Event>;
+    loading: boolean;
 }
 
-const ManagementPage = ({ type, data, headers }: ManagementPageProps) => {
+const ManagementPage = ({ type, data, headers, loading }: ManagementPageProps) => {
     const classes = useStyles();
     const [filteredData, setFilteredData] = useState<BasicItem[]>([...data.tasks, ...data.events]);
     const [search, setSearch] = useState<string>("");
@@ -89,6 +87,23 @@ const ManagementPage = ({ type, data, headers }: ManagementPageProps) => {
             :
             <h4>Total Tasks: {data.tasks.length}, Total Events: {data.events.length}</h4>
 
+    const getItemsView = () =>
+        <>
+            {
+                loading ?
+                    <Box sx={{ mt: "10%", textAlign: "center", color: "#F6E7E4" }}>
+                        <h1>LOADING...</h1>
+                    </Box>
+                    :
+                    <>
+                        {getSubtitle()}
+                        <ItemsTable headers={headers} items={filteredData} setItems={(newItems: Task[]) => setFilteredData(newItems)}
+                            handleEditItem={handleOpenUpdateForm} handleDeleteItem={handleOpenDeleteDialog}
+                            search={search} searchableProperties={searchableProperties} />
+                    </>
+            }
+        </>
+
     return (
         <Box>
             <h1>{type ? `${type}s` : "Today"} Management</h1>
@@ -97,21 +112,12 @@ const ManagementPage = ({ type, data, headers }: ManagementPageProps) => {
                 Add {type}
             </Button>
             {getFilters()}
-            {getSubtitle()}
-
             {isFormDialogOpen &&
                 <ItemForm type={type ? type : (itemToUpdate ? (itemToUpdate instanceof Task ? ItemType.Task : ItemType.Event) : ItemType.Task)} enableSwitchType={type ? false : true} open={isFormDialogOpen} handleClose={handleCloseItemForm} itemToUpdate={itemToUpdate ? itemToUpdate : undefined} />}
-            {
-                filteredData.length > 0 ?
-                    <ItemsTable headers={headers} items={filteredData} setItems={(newItems: Task[]) => setFilteredData(newItems)}
-                        handleEditItem={handleOpenUpdateForm} handleDeleteItem={handleOpenDeleteDialog}
-                        search={search} searchableProperties={searchableProperties} />
-                    :
-                    <h1 className={classes.noItems}>NO ITEMS</h1>
-            }
-
+            {getItemsView()}
             {isDeleteDialogOpen && itemToDelete != "" &&
                 <DeleteForm item={itemToDelete} open={isDeleteDialogOpen} handleClose={handleCloseDeleteDialog} />}
+
         </Box>
     );
 };

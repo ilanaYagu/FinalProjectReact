@@ -5,7 +5,11 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { store } from "./app/store";
 import { Provider } from 'react-redux';
+import { fetchEvents } from './feature/eventsSlice'
+import { fetchTasks } from './feature/tasksSlice'
 
+store.dispatch(fetchEvents())
+store.dispatch(fetchTasks())
 
 ReactDOM.render(
   <React.StrictMode>

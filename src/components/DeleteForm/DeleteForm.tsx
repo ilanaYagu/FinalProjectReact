@@ -17,7 +17,7 @@ function DeleteItemForm({ item, handleClose, open }: DeleteItemFormProps) {
 
     const handleDelete = (): void => {
         item instanceof Task ?
-            dispatch(deleteTask(item.id)) : dispatch(deleteEvent(item.id));
+            dispatch(deleteTask(item._id)) : dispatch(deleteEvent(item._id));
         handleClose();
     }
 

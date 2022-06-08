@@ -88,9 +88,8 @@ const TableItem = ({ item, index, headers, handleEditItem, handleDeleteItem }: T
             </IconButton>
         </>
 
-    return (<Draggable key={item.id} draggableId={item.id} index={index}>
-        {(
-            draggableProvided: DraggableProvided) => {
+    return (<Draggable key={item._id + ""} draggableId={item._id + ""} index={index}>
+        {(draggableProvided: DraggableProvided) => {
             return (
                 <TableRow ref={draggableProvided.innerRef} {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps}>
                     {

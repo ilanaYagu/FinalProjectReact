@@ -1,58 +1,97 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createColor } from "mui-color";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { HttpStatusType, API_URL } from "../app/store-constants";
 import { Event } from "../classes/Event";
 
 interface EventsState {
     events: Event[];
+    status: HttpStatusType;
+    error?: string;
 }
 
 const initialEventsState: EventsState = {
-    events: [
-        new Event("1", 'Vet - for my dogo', 'The doctor ask me to call him one day before the appointment.', '2022-06-01 12:23', '2022-07-09 13:23', createColor("#C88383"),
-            "Ashkelon, the clinic of Yosof",
-            "",
-            ["Michal Grinborg", "Ron C.", "Ilanit"]
-        ),
-        new Event("2", 'Wedding to my bff!', 'Need to buy a dress, and a gift of course.', '2022-06-01 19:30', '2025-09-13 05:45', createColor("#7EA87E"),
-            "Paris",
-            "",
-            ["Shai", "Ronit", "Hen Levis", "Sholamit"]
-        ),
-        new Event("232", 'Meeting with the hamus organization', 'with the highest there, like abu masen', '2025-07-20 17:30', '2025-07-20 18:45', createColor("#94B1A6"),
-            "Egypt",
-            "",
-            ["Ilanit Levi", "Galit Gutman", "Yunit"]
-        )
-    ]
+    events: [],
+    status: HttpStatusType.PENDING
 };
+
+const EVENTS_API_URL = `${API_URL}events/`;
+
+export const fetchEvents = createAsyncThunk<{ error: boolean; events: Event[]; }>('events/fetchEvents',
+    async () => {
+        const response = await fetch(`${EVENTS_API_URL}all`,
+            {
+                method: 'GET',
+
+            });
+        return (await response.json());
+    })
+
+export const addEvent = createAsyncThunk<{ error: boolean; event: Event; }, Event>('events/addEvent',
+    async (newEvent: Event) => {
+        const response = await fetch(`${EVENTS_API_URL}add`,
+            {
+                method: 'POST',
+                body: JSON.stringify({ event: newEvent })
+
+            });
+        return (await response.json());
+    })
+
+export const updateEvent = createAsyncThunk<{ error: boolean; event: Event; }, Event>('events/updateEvent',
+    async (event: Event) => {
+        const response = await fetch(`${EVENTS_API_URL}update`,
+            {
+                method: 'POST',
+                body: JSON.stringify({ event })
+
+            });
+        return (await response.json());
+    })
+
+export const deleteEvent = createAsyncThunk<{ error: boolean; _id: string; }, string>('events/deleteEvent',
+    async (_id: string) => {
+        const response = await fetch(`${EVENTS_API_URL}delete`,
+            {
+                method: 'POST',
+                body: JSON.stringify({ _id })
+
+            });
+        return (await response.json());
+    })
 
 const eventsSlice = createSlice({
     name: 'events',
     initialState: initialEventsState,
     reducers: {
-        addEvent: (state, action: PayloadAction<Event>): void => {
-            const newEvent = action.payload;
-            state.events.push(new Event(newEvent.id, newEvent.title, newEvent.description,
-                newEvent.beginningTime, newEvent.endingTime, newEvent.color, newEvent.location, newEvent.notificationTime, newEvent.invitedGuests));
-        },
-        updateEvent: (state, action: PayloadAction<Event>): void => {
-            const eventToUpdate = action.payload;
-            state.events = state.events.map((event) => {
-                if (event.id === eventToUpdate.id) {
-                    return new Event(eventToUpdate.id, eventToUpdate.title, eventToUpdate.description,
-                        eventToUpdate.beginningTime, eventToUpdate.endingTime, eventToUpdate.color, eventToUpdate.location, eventToUpdate.notificationTime, eventToUpdate.invitedGuests);
-                }
-                return event;
-            });;
-        },
-        deleteEvent: (state, action: PayloadAction<string>): void => {
-            state.events = state.events.filter((event) => {
-                return event.id !== action.payload;
-            });;
-        }
+    },
+    extraReducers(builder) {
+        builder
+            .addCase(fetchEvents.pending, (state, action) => {
+                state.status = HttpStatusType.PENDING;
+            })
+            .addCase(fetchEvents.fulfilled, (state, action) => {
+                action.payload.events.forEach((eventFromResponse) => {
+                    state.events.push(new Event(eventFromResponse));
+                })
+                state.status = HttpStatusType.FULFILLED;
+            })
+            .addCase(addEvent.fulfilled, (state, action) => {
+                state.events.push(new Event(action.payload.event))
+            })
+            .addCase(deleteEvent.fulfilled, (state, action) => {
+                state.events = state.events.filter((event) => {
+                    return event._id !== action.payload._id;
+                });;
+            })
+            .addCase(updateEvent.fulfilled, (state, action) => {
+                const eventToUpdate = action.payload.event;
+                state.events = state.events.map((event) => {
+                    if (event._id === eventToUpdate._id) {
+                        return new Event(eventToUpdate);
+                    }
+                    return event;
+                });;
+            })
     }
 })
 
-
-export const { addEvent, updateEvent, deleteEvent } = eventsSlice.actions;
 export default eventsSlice.reducer;

@@ -9,14 +9,14 @@ export class Task extends BasicItem {
   timeSpent: string;
   untilDate: string;
 
-  constructor(id: string, title: string, description: string, estimatedTime: string, status: StatusType, priority: PriorityType, review: string, timeSpent: string, untilDate: string) {
-    super(id, title, description);
-    this.estimatedTime = estimatedTime || "";
-    this.status = status || "Open";
-    this.priority = priority;
-    this.review = review || "";
-    this.timeSpent = timeSpent || "";
-    this.untilDate = untilDate || "";
+  constructor(task: Task) {
+    super(task._id, task.title, task.description);
+    this.estimatedTime = task.estimatedTime || "";
+    this.status = task.status || "Open";
+    this.priority = task.priority;
+    this.review = task.review || "";
+    this.timeSpent = task.timeSpent || "";
+    this.untilDate = task.untilDate || "";
   }
 
 
