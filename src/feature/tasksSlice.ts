@@ -23,7 +23,7 @@ export const fetchTasks = createAsyncThunk<{ error: boolean; tasks: Task[]; }>('
                 method: 'GET',
 
             });
-        return (await response.json());
+        return response.json();
     })
 
 export const addTask = createAsyncThunk<{ error: boolean; task: Task; }, Task>('tasks/addTask',
@@ -35,7 +35,7 @@ export const addTask = createAsyncThunk<{ error: boolean; task: Task; }, Task>('
 
             });
 
-        return (await response.json());
+        return await response.json();
     })
 
 export const updateTask = createAsyncThunk<{ error: boolean; task: Task; }, Task>('tasks/updateTask',
@@ -46,7 +46,7 @@ export const updateTask = createAsyncThunk<{ error: boolean; task: Task; }, Task
                 body: JSON.stringify({ task })
 
             });
-        return (await response.json());
+        return response.json();
     })
 
 export const deleteTask = createAsyncThunk<{ error: boolean; _id: string; }, string>('tasks/deleteTask',
@@ -57,7 +57,7 @@ export const deleteTask = createAsyncThunk<{ error: boolean; _id: string; }, str
                 body: JSON.stringify({ _id })
 
             });
-        return (await response.json());
+        return response.json();
     })
 
 const tasksSlice = createSlice({

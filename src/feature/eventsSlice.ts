@@ -22,7 +22,7 @@ export const fetchEvents = createAsyncThunk<{ error: boolean; events: Event[]; }
                 method: 'GET',
 
             });
-        return (await response.json());
+        return response.json();
     })
 
 export const addEvent = createAsyncThunk<{ error: boolean; event: Event; }, Event>('events/addEvent',
@@ -33,7 +33,7 @@ export const addEvent = createAsyncThunk<{ error: boolean; event: Event; }, Even
                 body: JSON.stringify({ event: newEvent })
 
             });
-        return (await response.json());
+        return response.json();
     })
 
 export const updateEvent = createAsyncThunk<{ error: boolean; event: Event; }, Event>('events/updateEvent',
@@ -44,7 +44,7 @@ export const updateEvent = createAsyncThunk<{ error: boolean; event: Event; }, E
                 body: JSON.stringify({ event })
 
             });
-        return (await response.json());
+        return response.json();
     })
 
 export const deleteEvent = createAsyncThunk<{ error: boolean; _id: string; }, string>('events/deleteEvent',
@@ -55,7 +55,7 @@ export const deleteEvent = createAsyncThunk<{ error: boolean; _id: string; }, st
                 body: JSON.stringify({ _id })
 
             });
-        return (await response.json());
+        return response.json();
     })
 
 const eventsSlice = createSlice({
