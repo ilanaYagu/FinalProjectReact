@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../app/store';
 import { ItemType } from '../../types/managementTableTypes';
 import { pink } from '@mui/material/colors';
+import { validateEventInputs, validateTaskInputs } from './item-form-utils';
 
 export type TaskInputs = Omit<Task, "_id" | "title" | "description">;
 export type EventInputs = Omit<Event, "_id" | "title" | "description">;
@@ -92,17 +93,12 @@ const ItemForm = ({ type, enableSwitchType, open, handleClose, itemToUpdate }: I
         let isValid: boolean = true;
         if (validator.trim(baseInputs.title) === "" || validator.trim(baseInputs.description) === "") {
             alert("Please fill the Required Fields");
+            isValid = false;
         }
         if (formType === ItemType.Event) {
-            if (validator.trim(eventInputs.beginningTime) === "" || validator.trim(eventInputs.endingTime) === "" || new Date(eventInputs.beginningTime) > new Date(eventInputs.endingTime)) {
-                alert("Please check your beginning and ending times");
-                isValid = false;
-            }
+            isValid = validateEventInputs(eventInputs);
         } else if (formType === ItemType.Task) {
-            if (taskInputs.priority === PriorityType.Top && validator.trim(taskInputs.untilDate) === "") {
-                alert("Please check your until date, it is an top task!");
-                isValid = false
-            }
+            isValid = validateTaskInputs(taskInputs);
         }
         return isValid;
     }

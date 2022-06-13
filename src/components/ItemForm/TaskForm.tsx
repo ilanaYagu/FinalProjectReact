@@ -3,8 +3,8 @@ import { Autocomplete, TextareaAutosize, TextField } from "@mui/material";
 import { TaskInputs } from './ItemForm';
 import DateTextField from './DateTextField';
 
-const statusesOptions: StatusType[] = Object.values(StatusType);
-const priorityOptions: PriorityType[] = Object.values(PriorityType);
+export const statusesOptions: StatusType[] = Object.values(StatusType);
+export const priorityOptions: PriorityType[] = Object.values(PriorityType);
 
 interface TaskFormProps {
     taskInputs: TaskInputs;
@@ -17,9 +17,7 @@ function TaskForm({ taskInputs, setTaskInputs, classField }: TaskFormProps) {
     const getAutoComplete = (field: keyof TaskInputs, options: string[], label: string) => {
         return <Autocomplete sx={{ mt: "2%" }} className={classField} freeSolo defaultValue={taskInputs[field]} options={options}
             onChange={(event: React.FormEvent) => {
-                let newValue: string = (event.target as HTMLInputElement).textContent as string;
-                newValue = !options.includes(newValue) ? options[0] : newValue;
-                setTaskInputs({ ...taskInputs, [field]: newValue })
+                setTaskInputs({ ...taskInputs, [field]: (event.target as HTMLInputElement).textContent as string })
             }}
             renderInput={(params) => (
                 <TextField {...params} label={label} InputProps={{ ...params.InputProps, type: 'search' }} />
