@@ -8,6 +8,9 @@ pip install openai
 function code_review {
     file=$1
     model=$2
+
+    echo "Processing file $file with engine $model"
+
     response=$(openai api completions.create \
         --engine $model \
         --prompt "Code review for $file" \
@@ -17,6 +20,8 @@ function code_review {
 
     # Extract the suggested changes from the OpenAI API response
     suggested_changes=$(echo $response | jq -r '.choices[].text')
+
+echo "Suggested changes: $suggested_changes"
 
     # Add a comment to the pull request with the suggested changes
     pr_number=$(echo $GITHUB_REF | cut -d/ -f3)
