@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export OPENAI_API_KEY=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
 
 # Install the OpenAI API client
 pip install openai
