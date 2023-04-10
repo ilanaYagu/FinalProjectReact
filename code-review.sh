@@ -24,11 +24,12 @@ function code_review {
     repo=$(basename `git rev-parse --show-toplevel`)
     api_url="https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr_number/comments"
     body="Suggested changes for \`$file\`: \n\n$suggested_changes"
-    curl -H "Authorization: token $GITHUB_TOKEN" \
+    curl -H "Authorization: token $MY_GITHUB_TOKEN" \
         --header "Content-Type: application/json" \
         --data "{\"body\":\"$body\"}" \
         $api_url
 }
+
 
 
 # Run code review on all JavaScript files in the src directory
