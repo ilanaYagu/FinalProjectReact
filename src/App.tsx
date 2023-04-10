@@ -43,7 +43,7 @@ const theme = createTheme({
 });
 
 const App = () => {
-  const events = useSelector((state: RootState) => state.events.events);
+  const event = useSelector((state: RootState) => state.events.events);
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
   const loadingEvents = useSelector((state: RootState) => state.events.status === HttpStatusType.PENDING);
   const loadingTasks = useSelector((state: RootState) => state.tasks.status === HttpStatusType.PENDING);
@@ -74,8 +74,8 @@ const App = () => {
         <Notifications />
         < Routes >
           <Route path="/tasks" element={<ManagementPage loading={loadingTasks} type={ItemType.Task} data={{ tasks: tasks, events: [] }} headers={columnsForTasksTable} />} />
-          <Route path="/events" element={<ManagementPage loading={loadingEvents} type={ItemType.Event} data={{ tasks: [], events: events }} headers={columnsForEventsTable} />} />
-          <Route path="/dashboard" element={<ManagementPage loading={loadingEvents || loadingTasks} data={{ tasks: filterTodayItems(tasks) as Task[], events: filterTodayItems(events) as Event[] }} headers={columnsForTodayTasksAndEventsTable} />} />
+          <Route path="/events" element={<ManagementPage loading={loadingEvents} type={ItemType.Event} data={{ tasks: [], events: event }} headers={columnsForEventsTable} />} />
+          <Route path="/dashboard" element={<ManagementPage loading={loadingEvents || loadingTasks} data={{ tasks: filterTodayItems(tasks) as Task[], events: filterTodayItems(event) as Event[] }} headers={columnsForTodayTasksAndEventsTable} />} />
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
         <NavSidebar />
