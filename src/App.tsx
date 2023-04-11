@@ -49,6 +49,7 @@ const App = () => {
   const loadingTasks = useSelector((state: RootState) => state.tasks.status === HttpStatusType.PENDING);
 
   useEffect(() => {
+    const i = 0;
     const socket = io(API_URL);
     socket.emit("sendEventsNotifications");
     socket.on("notification", (data: BasicItem[]) => {
