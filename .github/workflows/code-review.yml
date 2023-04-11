@@ -1,5 +1,6 @@
 name: Code Review
-on: pull_request
+on:
+  pull_request:
 jobs:
   code-review:
     runs-on: ubuntu-latest
@@ -12,33 +13,54 @@ jobs:
         run: |
           mkdir -p reviews
           find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
-          FILE_CONTENT=$(cat "$file" | sed 's/"/\\"/g')
-          curl -s -H "Content-Type: application/json" \
-          -H "Authorization: Bearer $OPENAI_API_KEY" \
-          -d "{\"model\": \"text-davinci-002\", \"prompt\": \"Review the following TypeScript code in a React application file '$file':\n\n${FILE_CONTENT}\", \"max_tokens\": 200, \"n\": 1, \"stop\": null, \"temperature\": 0.5, \"top_p\": 1, \"frequency_penalty\": 0, \"presence_penalty\": 0}" \
-          -X POST https://api.openai.com/v1/engines/davinci-codex/completions \
-          > "reviews/review_$(basename $file).json"
-          cat "reviews/review_$(basename $file).json"
-
+            FILE_CONTENT=$(cat "$file" | sed 's/"/\\"/g')
+            curl -s -H "Content-Type: application/json" \
+              -H "Authorization: Bearer $OPENAI_API_KEY" \
+              -d "{\"model\": \"text-davinci-002\", \"prompt\": \"Review the following TypeScript code in a React application file '$file':\\n\\n${FILE_CONTENT}\", \"max_tokens\": 200, \"n\": 1, \"stop\": null, \"temperature\": 0.5, \"top_p\": 1, \"frequency_penalty\": 0, \"presence_penalty\": 0}" \
+              -X POST https://api.openai.com/v1/engines/davinci-codex/completions \
+              > "reviews/review_$(basename $file).json"
+            cat "reviews/review_$(basename $file).json"
           done
       - name: Create review comments
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         run: |
-          PR_ID=$(jq --raw-output .number $GITHUB_EVENT_PATH)
-          COMMIT_ID=$(jq --raw-output .pull_request.head.sha $GITHUB_EVENT_PATH)
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
-            REVIEW=$(cat "reviews/review_$(basename $file).json" | jq -r '.choices[0].text')
-            echo "DEBUG: REVIEW=$REVIEW"
-            PAYLOAD=$(echo '{}' | jq --arg path "$file" --arg body "$REVIEW" '.path = $path | .body = $body')
-            echo "DEBUG: PAYLOAD=$PAYLOAD"
-            LINES=$(grep -n ".*" "$file" | cut -f1 -d:)
-            for LINE in $LINES; do
-              COMMENT_PAYLOAD=$(echo '{}' | jq --argjson line $LINE --argjson position $LINE --argjson body "$PAYLOAD" '.body = $body | .position = $position | .line = $line')
-              COMMIT_COMMENTS_URL="https://api.github.com/repos/${{ github.repository }}/commits/$COMMIT_ID/comments"
-              curl -s -H "Authorization: token $GITHUB_TOKEN" \
-               -H "Content-Type: application/json" \
-               -d "$COMMENT_PAYLOAD" \
-               -X POST $COMMIT_COMMENTS_URL
-            done
-          done
+          const { execSync } = require('child_process');
+          const { readFileSync } = require('fs');
+          const { join } = require('path');
+
+          const prNumber = process.env.GITHUB_REF.split('/')[2];
+          const prFiles = execSync(`curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/${prNumber}/files"`)
+            .toString()
+            .split('\n')
+            .filter(Boolean)
+            .map(line => JSON.parse(line).filename);
+
+          prFiles.forEach(file => {
+            const reviewFile = join('reviews', `review_${file.replace(/\//g, '_')}.json`);
+            const reviewContent = readFileSync(reviewFile, 'utf-8');
+            const reviewText = JSON.parse(reviewContent).choices[0].text.trim();
+
+            const fileContent = readFileSync(file, 'utf-8');
+            const fileLines = fileContent.split('\n');
+            const comments = [];
+            for (let i = 0; i < fileLines.length; i++) {
+              if (fileLines[i].includes(reviewText)) {
+                comments.push({
+                  path: file,
+                  position: i + 1,
+                  body: reviewText,
+                });
+              }
+            }
+
+            comments.forEach(comment => {
+              const payload = JSON.stringify({
+                body: comment.body,
+                path: comment.path,
+                position: comment.position,
+              });
+              const url = `https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments`;
+              execSync(`curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d '${payload}' -X POST ${url}`);
+            });
+          });
