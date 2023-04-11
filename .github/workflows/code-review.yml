@@ -19,19 +19,19 @@ jobs:
            -X POST https://api.openai.com/v1/engines/davinci-codex/completions \
            > "reviews/review_$(basename $file).json"
           done
-      - name: Post review comments
+      - name: Create review comments
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         run: |
           PR_ID=$(jq --raw-output .number $GITHUB_EVENT_PATH)
           COMMIT_ID=$(jq --raw-output .pull_request.head.sha $GITHUB_EVENT_PATH)
-          REVIEW_COMMENTS_URL=$(jq -r '.pull_request.review_comments_url' $GITHUB_EVENT_PATH)
           find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
           REVIEW=$(cat "reviews/review_$(basename $file).json" | jq -r '.choices[0].text')
           COMMENT_BODY=$(echo -e "OpenAI Code Review:\n\n\`\`\`\n${REVIEW}\n\`\`\`")
-          PAYLOAD=$(echo '{}' | jq --arg path "$file" --argjson line 1 --arg body "$COMMENT_BODY" --arg commit_id "$COMMIT_ID" '.path = $path | .line = $line | .body = $body | .commit_id = $commit_id')
+          PAYLOAD=$(echo '{}' | jq --arg path "$file" --arg body "$COMMENT_BODY" '.path = $path | .body = $body')
+          COMMIT_COMMENTS_URL="https://api.github.com/repos/${{ github.repository }}/commits/$COMMIT_ID/comments"
           curl -s -H "Authorization: token $GITHUB_TOKEN" \
            -H "Content-Type: application/json" \
            -d "$PAYLOAD" \
-           -X POST $REVIEW_COMMENTS_URL
+           -X POST $COMMIT_COMMENTS_URL
           done
