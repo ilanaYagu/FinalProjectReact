@@ -27,7 +27,7 @@ jobs:
           COMMIT_ID=$(jq --raw-output .pull_request.head.sha $GITHUB_EVENT_PATH)
           find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
             REVIEW=$(cat "reviews/review_$(basename $file).json" | jq -r '.choices[0].text')
-            PAYLOAD=$(echo '{}' | jq --arg body "$REVIEW" --arg path "$file" '.body = $body | .path = $path')
+            PAYLOAD=$(echo '{}' | jq --arg path "$file" --argjson line $LINE_NUMBER --arg body "$REVIEW" '.path = $path | .line = $line | .body = $body')
             LINES=$(grep -n ".*" "$file" | cut -f1 -d:)
             for LINE in $LINES; do
               COMMENT_PAYLOAD=$(echo '{}' | jq --argjson line $LINE --argjson position $LINE --argjson body "$PAYLOAD" '.body = $body | .position = $position | .line = $line')
