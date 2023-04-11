@@ -19,19 +19,20 @@ jobs:
            -X POST https://api.openai.com/v1/engines/davinci-codex/completions \
            > "reviews/review_$(basename $file).json"
           done
-      - name: Create review comments
+      - name: Create comments
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
+          mediaType: '{"previews": ["comfort-fade"]}'
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         run: |
-          PR_ID=$(jq --raw-output .number $GITHUB_EVENT_PATH)
-          COMMIT_ID=$(jq --raw-output .pull_request.head.sha $GITHUB_EVENT_PATH)
+          COMMENTS=""
           find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
           REVIEW=$(cat "reviews/review_$(basename $file).json" | jq -r '.choices[0].text')
-          COMMENT_BODY=$(echo -e "OpenAI Code Review:\n\n\`\`\`\n${REVIEW}\n\`\`\`")
-          PAYLOAD=$(echo '{}' | jq --arg path "$file" --argjson position 1 --arg body "$COMMENT_BODY" --arg commit_id "$COMMIT_ID" '.path = $path | .position = $position | .body = $body | .commit_id = $commit_id')
-          REVIEW_COMMENTS_URL=$(jq -r '.pull_request.review_comments_url' $GITHUB_EVENT_PATH)
-          curl -s -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d "$PAYLOAD" \
-          -X POST $REVIEW_COMMENTS_URL
+          COMMENTS+=$'\n\n'$(echo -e "### OpenAI Code Review for $file:\n\n\`\`\`\n${REVIEW}\n\`\`\`")
           done
+          echo "BODY=$COMMENTS" >> $GITHUB_ENV
