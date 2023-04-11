@@ -20,6 +20,15 @@ jobs:
            > "reviews/review_$(basename $file).json"
           done
       - name: Create comments
+        run: |
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
+          REVIEW=$(cat "reviews/review_$(basename $file).json" | jq -r '.choices[0].text')
+          COMMENT_BODY=$(echo -e "OpenAI Code Review:\n\n\`\`\`\n${REVIEW}\n\`\`\`")
+          echo "COMMENT_BODY=$COMMENT_BODY" >> $GITHUB_ENV
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+      - name: Post review comments
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
@@ -27,12 +36,6 @@ jobs:
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
           issue_number: ${{ github.event.number }}
+          body: ${{ env.COMMENT_BODY }}
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        run: |
-          COMMENTS=""
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
-          REVIEW=$(cat "reviews/review_$(basename $file).json" | jq -r '.choices[0].text')
-          COMMENTS+=$'\n\n'$(echo -e "### OpenAI Code Review for $file:\n\n\`\`\`\n${REVIEW}\n\`\`\`")
-          done
-          echo "BODY=$COMMENTS" >> $GITHUB_ENV
