@@ -11,6 +11,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Debug
+        env:
+          PAYLOAD: ${{ toJson(github.context.payload) }}
+        run: echo $PAYLOAD
+
       - name: Code Review
         uses: ./.github/actions/code-review
         with:
