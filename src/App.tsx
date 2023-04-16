@@ -1,5 +1,5 @@
 import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
-import { NavSidebar } from './components/NavSidebar/NavSidebar';
+import { NavSidebar } from './components/NavSideBar/NavSideBar';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from '@mui/material';
 import { blueGrey, grey } from '@mui/material/colors';
