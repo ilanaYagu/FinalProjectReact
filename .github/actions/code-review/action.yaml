@@ -1,0 +1,40 @@
+name: "Code Review"
+description: "A GitHub Action that uses OpenAI to review code in pull requests"
+author: "ILANA"
+inputs:
+  PROGRAMMING_LANGUAGE:
+    description: "The programming language of the code (default: auto)"
+    required: false
+    default: "auto"
+  OPENAI_TOKEN:
+    description: "The OpenAI API token"
+    required: true
+  FULL_REVIEW_COMMENT:
+    description: "The full review comment (default: [full-review])"
+    required: false
+    default: "[full-review]"
+  REVIEW_COMMENT_PREFIX:
+    description: "The review comment prefix (default: Review:)"
+    required: false
+    default: "Review:"
+  GITHUB_TOKEN:
+    description: "The GitHub API token"
+    required: true
+  GITHUB_BASE_URL:
+    description: "The GitHub API base URL (optional)"
+    required: false
+  PROMPT_TEMPLATE:
+    description: "The prompt template (default: Please review the following code: ${code})"
+    required: false
+    default: "Please review the following code: ${code}"
+  MAX_CODE_LENGTH:
+    description: "The maximum code length (default: 5000)"
+    required: false
+    default: "5000"
+  ANSWER_TEMPLATE:
+    description: "The answer template (default: Code review: ${answer})"
+    required: false
+    default: "Code review: ${answer}"
+runs:
+  using: "node12"
+  main: "index.js"
