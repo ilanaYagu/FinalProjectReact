@@ -2,10 +2,7 @@ name: Code Review
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+    types: [opened, synchronize, reopened]
 
 jobs:
   code_review:
@@ -13,6 +10,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Debug
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo $GITHUB_CONTEXT
 
       - name: Code Review
         uses: ./.github/actions/code-review
@@ -22,3 +24,4 @@ jobs:
           FULL_REVIEW_COMMENT: 'chatgpt'
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -40,7 +40,7 @@ async function performCodeReview() {
         const prNumber = issue.number; // get number from a pull request event or comment event
 
         // Get the code to analyze from the review comment
-        let content = comment?.body || '';
+        let content = comment && comment.body ? comment.body : '';
 
         const url = `${inputs.githubBaseURL}/repos/${repoOwner}/${repoName}/pulls/${prNumber}`;
         core.debug(`Diff URL: ${url}`);

@@ -12,5 +12,6 @@ export const store = configureStore({
     })
 });
 
+const blankVar = [];
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
