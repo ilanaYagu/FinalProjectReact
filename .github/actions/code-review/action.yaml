@@ -36,5 +36,5 @@ inputs:
     required: false
     default: "Code review: ${answer}"
 runs:
-  using: "node12"
+  using: "node16"
   main: "index.js"
