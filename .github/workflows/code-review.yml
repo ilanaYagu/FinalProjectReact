@@ -13,8 +13,8 @@ jobs:
 
       - name: Debug
         env:
-          PAYLOAD: ${{ toJson(github.context.payload) }}
-        run: echo $PAYLOAD
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo $GITHUB_CONTEXT
 
       - name: Code Review
         uses: ./.github/actions/code-review
@@ -24,3 +24,4 @@ jobs:
           FULL_REVIEW_COMMENT: 'chatgpt'
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
